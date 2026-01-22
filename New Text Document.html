@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FC 26 Match Generator</title>
+    <style>
+        :root {
+            --primary: #39ff14; /* Neon Green */
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --panel-bg: #252525;
+            --text: #ffffff;
+            --text-muted: #aaaaaa;
+            --danger: #ff4444;
+            --accent-blue: #00d9ff;
+            --gold: #ffd700;
+            --derby: #ff3333;
+            --historic: #d4af37;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 2rem;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        span.fc-logo {
+            color: var(--primary);
+        }
+
+        /* --- CONFIGURATION SECTION --- */
+        .config-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 1.5rem;
+        }
+
+        .side-panel {
+            flex: 1;
+            background: var(--panel-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            min-width: 280px;
+            border: 1px solid #333;
+            text-align: left;
+        }
+
+        .side-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .control-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background-color: #333;
+            color: white;
+            font-size: 0.95rem;
+        }
+
+        /* Range Slider Styling */
+        .range-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .range-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 6px;
+            background: #444;
+            border-radius: 5px;
+            outline: none;
+            accent-color: var(--primary);
+        }
+
+        /* Unique slider colors for Real Match section */
+        .real-match-settings input[type="range"] {
+            accent-color: var(--accent-blue);
+        }
+        .real-match-settings .range-value {
+            color: var(--accent-blue);
+        }
+
+        .range-value {
+            font-family: monospace;
+            color: var(--primary);
+            font-weight: bold;
+            width: 40px;
+            text-align: right;
+        }
+
+        /* Real Match Settings Area */
+        .real-match-settings {
+            background: rgba(0, 217, 255, 0.05);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .real-match-title {
+            color: var(--accent-blue);
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Button Group */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Generate Buttons */
+        .generate-btn {
+            background-color: var(--primary);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-weight: 800;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+            min-width: 200px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(57, 255, 20, 0.3);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(57, 255, 20, 0.5);
+        }
+
+        .random-btn {
+            background-color: var(--accent-blue);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-weight: 800;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+            min-width: 200px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
+        }
+
+        .random-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 217, 255, 0.5);
+        }
+
+        .historic-btn {
+            background-color: var(--gold);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-weight: 800;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+            min-width: 200px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .historic-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .generate-btn:active, .random-btn:active, .historic-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Match Display */
+        .match-display {
+            margin-top: 3rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        .match-display.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .context-badge {
+            position: absolute;
+            top: -45px;
+            background: #333;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 900;
+            color: var(--gold);
+            border: 2px solid #444;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
+        .context-badge.derby {
+            background: #300;
+            border-color: var(--derby);
+            color: var(--derby);
+            box-shadow: 0 0 15px rgba(255, 51, 51, 0.3);
+        }
+
+        .context-badge.historic {
+            background: #332b00;
+            border-color: var(--historic);
+            color: var(--historic);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .team-card {
+            background: linear-gradient(145deg, #2a2a2a, #222);
+            padding: 2rem;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 350px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid #333;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: border-color 0.3s;
+        }
+
+        .team-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin: 15px 0 5px 0;
+            line-height: 1.2;
+        }
+
+        .team-meta {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stars-display {
+            color: #ffd700;
+            margin-top: 10px;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+
+        .vs-badge {
+            background: #fff;
+            color: #000;
+            font-weight: 900;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            z-index: 2;
+        }
+
+        .error-msg {
+            color: var(--danger);
+            margin-top: 1rem;
+            font-weight: bold;
+            display: none;
+            padding: 10px;
+            background: rgba(255, 68, 68, 0.1);
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .match-display { flex-direction: column; gap: 1rem; margin-top: 4rem; }
+            .vs-badge { transform: rotate(90deg); }
+            .side-panel { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1><span class="fc-logo">FC 26</span> Match Generator</h1>
+    <div class="subtitle">Real World Match Logic • Leagues • Cups • Derbies • Historic</div>
+
+    <!-- CUSTOM CONFIGURATION AREA -->
+    <div class="config-area">
+        
+        <!-- LEFT SIDE: HOME -->
+        <div class="side-panel">
+            <div class="side-title">
+                HOME TEAM
+                <span style="font-size:0.8em; opacity:0.6;">(Left)</span>
+            </div>
+            
+            <div class="control-group">
+                <label>Filter Pool</label>
+                <select id="homeType">
+                    <option value="all">All Teams</option>
+                    <option value="men_club" selected>Men's Clubs</option>
+                    <option value="women_club">Women's Clubs</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Star Rating Range</label>
+                <div class="range-container">
+                    <div class="range-wrapper">
+                        <span style="font-size:0.8rem; width:30px;">Min</span>
+                        <input type="range" id="homeMin" min="1" max="5" step="0.5" value="3.5" oninput="updateRange('home')">
+                        <span id="homeMinVal" class="range-value">3.5</span>★
+                    </div>
+                    <div class="range-wrapper">
+                        <span style="font-size:0.8rem; width:30px;">Max</span>
+                        <input type="range" id="homeMax" min="1" max="5" step="0.5" value="5" oninput="updateRange('home')">
+                        <span id="homeMaxVal" class="range-value">5.0</span>★
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE: AWAY -->
+        <div class="side-panel">
+            <div class="side-title">
+                AWAY TEAM
+                <span style="font-size:0.8em; opacity:0.6;">(Right)</span>
+            </div>
+
+            <div class="control-group">
+                <label>Filter Pool</label>
+                <select id="awayType">
+                    <option value="all">All Teams</option>
+                    <option value="men_club" selected>Men's Clubs</option>
+                    <option value="women_club">Women's Clubs</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Star Rating Range</label>
+                <div class="range-container">
+                    <div class="range-wrapper">
+                        <span style="font-size:0.8rem; width:30px;">Min</span>
+                        <input type="range" id="awayMin" min="1" max="5" step="0.5" value="2.5" oninput="updateRange('away')">
+                        <span id="awayMinVal" class="range-value">2.5</span>★
+                    </div>
+                    <div class="range-wrapper">
+                        <span style="font-size:0.8rem; width:30px;">Max</span>
+                        <input type="range" id="awayMax" min="1" max="5" step="0.5" value="4" oninput="updateRange('away')">
+                        <span id="awayMaxVal" class="range-value">4.0</span>★
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- REAL MATCH SETTINGS -->
+    <div class="real-match-settings">
+        <div class="real-match-title">Real Match Star Filter</div>
+        <div class="range-container" style="max-width: 600px; margin: 0 auto;">
+            <div class="range-wrapper">
+                <span style="font-size:0.8rem; width:30px; color:var(--accent-blue);">Min</span>
+                <input type="range" id="realMin" min="1" max="5" step="0.5" value="1" oninput="updateRange('real')">
+                <span id="realMinVal" class="range-value">1.0</span>★
+            </div>
+            <div class="range-wrapper">
+                <span style="font-size:0.8rem; width:30px; color:var(--accent-blue);">Max</span>
+                <input type="range" id="realMax" min="1" max="5" step="0.5" value="5" oninput="updateRange('real')">
+                <span id="realMaxVal" class="range-value">5.0</span>★
+            </div>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button class="generate-btn" onclick="generateCustomMatch()">CUSTOM MATCHUP</button>
+        <button class="random-btn" onclick="generateRealWorldMatch()">🎲 GENERATE REAL MATCH</button>
+        <button class="historic-btn" onclick="generateMemorableMatch()">🏛️ HISTORIC MATCH</button>
+    </div>
+    
+    <div id="errorMsg" class="error-msg"></div>
+
+    <!-- MATCH DISPLAY -->
+    <div class="match-display" id="matchDisplay">
+        
+        <div class="context-badge" id="matchContext">Match Type</div>
+
+        <!-- HOME CARD -->
+        <div class="team-card" id="homeCard">
+            <div class="team-meta" id="homeLeague">League</div>
+            <div class="team-name" id="homeName">Team Name</div>
+            <div class="stars-display" id="homeStars">★★★★★</div>
+        </div>
+
+        <div class="vs-badge">VS</div>
+
+        <!-- AWAY CARD -->
+        <div class="team-card" id="awayCard">
+            <div class="team-meta" id="awayLeague">League</div>
+            <div class="team-name" id="awayName">Team Name</div>
+            <div class="stars-display" id="awayStars">★★★★★</div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // --- SPECIAL DATA ---
+    const derbyDB = {
+        // England
+        "Arsenal": ["Tottenham Hotspur", "Chelsea", "Manchester United"],
+        "Tottenham Hotspur": ["Arsenal", "Chelsea", "West Ham"],
+        "Manchester United": ["Manchester City", "Liverpool", "Leeds United", "Arsenal"],
+        "Manchester City": ["Manchester United", "Liverpool"],
+        "Liverpool": ["Everton", "Manchester United", "Manchester City"],
+        "Everton": ["Liverpool"],
+        "Chelsea": ["Arsenal", "Tottenham Hotspur", "Fulham"],
+        "Aston Villa": ["Birmingham City"],
+        "Birmingham City": ["Aston Villa"],
+        "Newcastle United": ["Sunderland"],
+        "Sunderland": ["Newcastle United"],
+        
+        // Spain
+        "Real Madrid": ["FC Barcelona", "Atlético Madrid"],
+        "FC Barcelona": ["Real Madrid", "Espanyol"],
+        "Atlético Madrid": ["Real Madrid"],
+        "Sevilla": ["Real Betis"],
+        "Real Betis": ["Sevilla"],
+        "Real Sociedad": ["Athletic Club"],
+        "Athletic Club": ["Real Sociedad"],
+
+        // Italy
+        "Inter": ["AC Milan", "Juventus"],
+        "AC Milan": ["Inter", "Juventus"],
+        "Juventus": ["Inter", "AC Milan", "Torino"],
+        "Roma": ["Lazio"],
+        "Lazio": ["Roma"],
+        "Torino": ["Juventus"],
+        
+        // Germany
+        "Borussia Dortmund": ["Schalke", "Bayern Munich"],
+        "Schalke": ["Borussia Dortmund"],
+        "Bayern Munich": ["Borussia Dortmund", "1860 Munich"],
+        "Hamburg": ["St. Pauli", "Werder Bremen"],
+        "Werder Bremen": ["Hamburg"],
+        
+        // Others
+        "Celtic": ["Rangers"],
+        "Rangers": ["Celtic"],
+        "Boca Juniors": ["River Plate"],
+        "River Plate": ["Boca Juniors"],
+        "Flamengo": ["Fluminense", "Vasco da Gama"],
+        "Fluminense": ["Flamengo"],
+        "Benfica": ["Sporting CP", "FC Porto"],
+        "Sporting CP": ["Benfica"],
+        "FC Porto": ["Benfica"],
+        "Galatasaray": ["Fenerbahçe", "Beşiktaş"],
+        "Fenerbahçe": ["Galatasaray", "Beşiktaş"],
+        "Beşiktaş": ["Fenerbahçe", "Galatasaray"],
+        "Ajax": ["Feyenoord"],
+        "Feyenoord": ["Ajax"]
+    };
+
+    const memorableDB = [
+        // CHAMPIONS LEAGUE FINALS
+        { t1: "Manchester United", t2: "Bayern Munich", label: "👑 1999 UCL Final (Solskjaer)" },
+        { t1: "Liverpool", t2: "AC Milan", label: "👑 2005 Istanbul Miracle" },
+        { t1: "AC Milan", t2: "Liverpool", label: "👑 2007 Athens Redemption" },
+        { t1: "Manchester United", t2: "Chelsea", label: "🌧️ 2008 Moscow Final" },
+        { t1: "FC Barcelona", t2: "Manchester United", label: "👑 2009 Rome Final" },
+        { t1: "Inter", t2: "Bayern Munich", label: "👑 2010 Treble Final" },
+        { t1: "FC Barcelona", t2: "Manchester United", label: "👑 2011 Wembley Masterclass" },
+        { t1: "Chelsea", t2: "Bayern Munich", label: "👑 2012 Final (Drogba's Night)" },
+        { t1: "Bayern Munich", t2: "Borussia Dortmund", label: "👑 2013 Wembley Final" },
+        { t1: "Real Madrid", t2: "Atlético Madrid", label: "👑 2014 La Decima (92:48)" },
+        { t1: "FC Barcelona", t2: "Juventus", label: "👑 2015 Berlin Final" },
+        { t1: "Real Madrid", t2: "Atlético Madrid", label: "👑 2016 San Siro Shootout" },
+        { t1: "Real Madrid", t2: "Juventus", label: "👑 2017 Cardiff Final" },
+        { t1: "Real Madrid", t2: "Liverpool", label: "👑 2018 Kiev Final (Bale)" },
+        { t1: "Liverpool", t2: "Tottenham Hotspur", label: "👑 2019 Madrid Final" },
+        { t1: "Bayern Munich", t2: "Paris Saint-Germain", label: "👑 2020 Lisbon Final" },
+        { t1: "Chelsea", t2: "Manchester City", label: "👑 2021 Porto Final" },
+        { t1: "Real Madrid", t2: "Liverpool", label: "👑 2022 Paris Final" },
+        { t1: "Manchester City", t2: "Inter", label: "👑 2023 Istanbul Final" },
+        { t1: "FC Porto", t2: "Monaco", label: "👑 2004 Mourinho Masterclass" },
+        { t1: "Real Madrid", t2: "Bayer Leverkusen", label: "👑 2002 Zidane Volley" },
+        { t1: "Ajax", t2: "AC Milan", label: "👑 1995 Vienna Final" },
+        { t1: "Borussia Dortmund", t2: "Juventus", label: "👑 1997 Munich Final" },
+        { t1: "Aston Villa", t2: "Bayern Munich", label: "👑 1982 European Cup Final" },
+        { t1: "Nottingham Forest", t2: "Malmö FF", label: "👑 1979 European Cup Final" },
+        { t1: "Feyenoord", t2: "Celtic", label: "👑 1970 European Cup Final" },
+        { t1: "PSV Eindhoven", t2: "SL Benfica", label: "👑 1988 European Cup Final" },
+        { t1: "Red Star Belgrade", t2: "Marseille", label: "👑 1991 European Cup Final" },
+
+        // ICONIC KNOCKOUTS & COMEBACKS
+        { t1: "FC Barcelona", t2: "Paris Saint-Germain", label: "🔥 La Remontada (6-1)" },
+        { t1: "Liverpool", t2: "FC Barcelona", label: "🔥 Corner Taken Quickly (4-0)" },
+        { t1: "Roma", t2: "FC Barcelona", label: "🏛️ The Roma Miracle (3-0)" },
+        { t1: "Tottenham Hotspur", t2: "Ajax", label: "⏱️ Lucas Moura Miracle (2019)" },
+        { t1: "Manchester United", t2: "Paris Saint-Germain", label: "🇫🇷 Paris Night (Rashford PK)" },
+        { t1: "Deportivo La Coruña", t2: "AC Milan", label: "🔥 Riazor Miracle (4-0)" },
+        { t1: "Chelsea", t2: "FC Barcelona", label: "🛡️ 2012 Semi-Final (Torres)" },
+        { t1: "Inter", t2: "FC Barcelona", label: "🛡️ 2010 Semi-Final (Mourinho)" },
+        { t1: "Bayern Munich", t2: "FC Barcelona", label: "😱 The 8-2 Demolition" },
+        { t1: "AS Monaco", t2: "Real Madrid", label: "🇫🇷 Morientes Revenge (2004)" },
+        { t1: "Manchester City", t2: "Real Madrid", label: "⚔️ 2022 Semi-Final Thriller (4-3)" },
+        { t1: "Real Madrid", t2: "Manchester City", label: "⚡ Bernabeu Comeback (2022)" },
+        { t1: "Leeds United", t2: "Deportivo La Coruña", label: "⚔️ 2001 UCL Quarter-Final" },
+        { t1: "Villarreal", t2: "Arsenal", label: "⚔️ 2006 UCL Semi-Final" },
+        { t1: "Chelsea", t2: "Liverpool", label: "⚔️ 2000s UCL Rivalry" },
+
+        // LEAGUE CLASSICS & DOMESTIC
+        { t1: "Manchester City", t2: "QPR", label: "⏱️ AGUEROOOO! (2012)" },
+        { t1: "Arsenal", t2: "Liverpool", label: "⏱️ Thomas at Anfield (1989)" },
+        { t1: "Manchester United", t2: "Arsenal", label: "🥊 The Battle of Old Trafford" },
+        { t1: "Manchester United", t2: "Arsenal", label: "😱 The 8-2 (2011)" },
+        { t1: "Manchester City", t2: "Manchester United", label: "🏙️ The 6-1 (Why Always Me?)" },
+        { t1: "Liverpool", t2: "Manchester United", label: "😱 The 7-0 (2023)" },
+        { t1: "Newcastle United", t2: "Arsenal", label: "⏱️ The 4-4 Comeback (2011)" },
+        { t1: "Tottenham Hotspur", t2: "Arsenal", label: "🔥 5-4 NLD Thriller (2004)" },
+        { t1: "Liverpool", t2: "Newcastle United", label: "⏱️ The 4-3 Collymore Match" },
+        { t1: "FC Barcelona", t2: "Real Madrid", label: "🖐️ The Manita (5-0)" },
+        { t1: "Real Madrid", t2: "FC Barcelona", label: "⚔️ The 2-6 Bernabeu Shock" },
+        { t1: "Juventus", t2: "Inter", label: "🇮🇹 Derby d'Italia Controversy (1998)" },
+        { t1: "AC Milan", t2: "Inter", label: "🎆 The Flare Derby (2005)" },
+        { t1: "Lazio", t2: "Inter", label: "🇮🇹 May 5th 2002 Drama" },
+        { t1: "Borussia Dortmund", t2: "Schalke", label: "🇩🇪 The 4-4 Revierderby" },
+        
+        // SOUTH AMERICAN CLASSICS
+        { t1: "Boca Juniors", t2: "River Plate", label: "🔥 Copa Libertadores Final (Madrid)" },
+        { t1: "Flamengo", t2: "River Plate", label: "🏆 2019 Libertadores Final" },
+        { t1: "Palmeiras", t2: "Santos", label: "🏆 2020 Libertadores Final" },
+        { t1: "Boca Juniors", t2: "Fluminense", label: "🏆 2023 Libertadores Final" },
+        { t1: "Boca Juniors", t2: "Real Madrid", label: "🌍 Intercontinental Cup 2000" },
+        { t1: "São Paulo", t2: "Liverpool", label: "🌍 CWC Final 2005" },
+        { t1: "Internacional", t2: "FC Barcelona", label: "🌍 CWC Final 2006" },
+        { t1: "Corinthians", t2: "Chelsea", label: "🌍 CWC Final 2012" },
+        { t1: "Estudiantes", t2: "FC Barcelona", label: "🌍 CWC Final 2009 (Messi Heart)" },
+
+        // EUROPA / UEFA CUP CLASSICS
+        { t1: "Liverpool", t2: "Alavés", label: "🏆 2001 UEFA Cup (5-4)" },
+        { t1: "Sevilla", t2: "Benfica", label: "🏆 2014 Europa Final" },
+        { t1: "Atlético Madrid", t2: "Athletic Club", label: "🏆 2012 All-Spanish Final" },
+        { t1: "Manchester United", t2: "Ajax", label: "🏆 2017 Europa Final" },
+        { t1: "Villarreal", t2: "Manchester United", label: "🏆 2021 Penalty Shootout" },
+        { t1: "Fulham", t2: "Atlético Madrid", label: "🏆 2010 Hamburg Final" },
+        { t1: "Celtic", t2: "FC Porto", label: "🏆 2003 Seville Final" },
+        { t1: "Rangers", t2: "Eintracht Frankfurt", label: "🏆 2022 Seville Final" },
+        { t1: "Zenit", t2: "Rangers", label: "🏆 2008 UEFA Cup Final" },
+        { t1: "Shakhtar Donetsk", t2: "Werder Bremen", label: "🏆 2009 UEFA Cup Final" },
+        { t1: "Galatasaray", t2: "Arsenal", label: "🏆 2000 UEFA Cup Final" },
+        { t1: "Feyenoord", t2: "Borussia Dortmund", label: "🏆 2002 UEFA Cup Final" },
+        { t1: "CSKA Moscow", t2: "Sporting CP", label: "🏆 2005 UEFA Cup Final (Lisbon)" }
+    ];
+
+    // --- COOLDOWN LOGIC (SMART) ---
+    // User requested "Same 10 clicks" -> 10 matches -> 20 teams.
+    const MAX_HISTORY = 20; 
+    let recentTeams = []; 
+
+    function addToHistory(teamName) {
+        // Remove if exists to move to end (update recency)
+        const idx = recentTeams.indexOf(teamName);
+        if (idx > -1) {
+            recentTeams.splice(idx, 1);
+        }
+        recentTeams.push(teamName);
+        
+        // Trim history
+        if (recentTeams.length > MAX_HISTORY) {
+            recentTeams.shift(); 
+        }
+    }
+
+    function isTeamOnCooldown(teamName) {
+        return recentTeams.includes(teamName);
+    }
+
+    // --- DATABASE (FULL) ---
+    const teamsDB = [
+        // --- ENGLAND (Premier League) ---
+        {n:"Manchester City", s:5, l:"Premier League", t:"men_club"},
+        {n:"Liverpool", s:5, l:"Premier League", t:"men_club"},
+        {n:"Arsenal", s:5, l:"Premier League", t:"men_club"},
+        {n:"Manchester United", s:4.5, l:"Premier League", t:"men_club"},
+        {n:"Chelsea", s:4.5, l:"Premier League", t:"men_club"},
+        {n:"Tottenham Hotspur", s:4.5, l:"Premier League", t:"men_club"},
+        {n:"Newcastle United", s:4.5, l:"Premier League", t:"men_club"},
+        {n:"Aston Villa", s:4, l:"Premier League", t:"men_club"},
+        {n:"Brighton", s:4, l:"Premier League", t:"men_club"},
+        {n:"West Ham", s:4, l:"Premier League", t:"men_club"},
+        {n:"Crystal Palace", s:3.5, l:"Premier League", t:"men_club"},
+        {n:"Everton", s:3.5, l:"Premier League", t:"men_club"},
+        {n:"Wolves", s:3.5, l:"Premier League", t:"men_club"},
+        {n:"Fulham", s:3.5, l:"Premier League", t:"men_club"},
+        {n:"Bournemouth", s:3.5, l:"Premier League", t:"men_club"},
+        {n:"Brentford", s:3.5, l:"Premier League", t:"men_club"},
+        {n:"Nottingham Forest", s:3.5, l:"Premier League", t:"men_club"},
+        {n:"Leicester City", s:3, l:"Premier League", t:"men_club"},
+        {n:"Southampton", s:3, l:"Premier League", t:"men_club"},
+        {n:"Ipswich Town", s:3, l:"Premier League", t:"men_club"},
+        // --- ENGLAND (Championship) ---
+        {n:"Leeds United", s:3.5, l:"Championship", t:"men_club"},
+        {n:"Burnley", s:3.5, l:"Championship", t:"men_club"},
+        {n:"Sheffield United", s:3.5, l:"Championship", t:"men_club"},
+        {n:"Norwich City", s:3, l:"Championship", t:"men_club"},
+        {n:"West Brom", s:3, l:"Championship", t:"men_club"},
+        {n:"Middlesbrough", s:3, l:"Championship", t:"men_club"},
+        {n:"Coventry City", s:3, l:"Championship", t:"men_club"},
+        {n:"Watford", s:3, l:"Championship", t:"men_club"},
+        {n:"Hull City", s:3, l:"Championship", t:"men_club"},
+        {n:"Sunderland", s:2.5, l:"Championship", t:"men_club"},
+        {n:"Stoke City", s:2.5, l:"Championship", t:"men_club"},
+        {n:"Blackburn Rovers", s:2.5, l:"Championship", t:"men_club"},
+        {n:"QPR", s:2.5, l:"Championship", t:"men_club"},
+        {n:"Bristol City", s:2.5, l:"Championship", t:"men_club"},
+        {n:"Swansea City", s:2.5, l:"Championship", t:"men_club"},
+        {n:"Preston North End", s:2.5, l:"Championship", t:"men_club"},
+        {n:"Millwall", s:2.5, l:"Championship", t:"men_club"},
+        {n:"Sheffield Wednesday", s:2.5, l:"Championship", t:"men_club"},
+        {n:"Plymouth Argyle", s:2.5, l:"Championship", t:"men_club"},
+        {n:"Portsmouth", s:2.5, l:"Championship", t:"men_club"},
+        {n:"Derby County", s:2.5, l:"Championship", t:"men_club"},
+        {n:"Oxford United", s:2.5, l:"Championship", t:"men_club"},
+        {n:"Cardiff City", s:2.5, l:"Championship", t:"men_club"},
+        // --- ENGLAND (League One) ---
+        {n:"Birmingham City", s:3, l:"League One", t:"men_club"},
+        {n:"Wrexham", s:2.5, l:"League One", t:"men_club"},
+        {n:"Bolton Wanderers", s:2.5, l:"League One", t:"men_club"},
+        {n:"Huddersfield Town", s:2.5, l:"League One", t:"men_club"},
+        {n:"Charlton Athletic", s:2.5, l:"League One", t:"men_club"},
+        {n:"Rotherham United", s:2.5, l:"League One", t:"men_club"},
+        {n:"Barnsley", s:2, l:"League One", t:"men_club"},
+        {n:"Blackpool", s:2, l:"League One", t:"men_club"},
+        {n:"Reading", s:2, l:"League One", t:"men_club"},
+        {n:"Wigan Athletic", s:2, l:"League One", t:"men_club"},
+        {n:"Wycombe Wanderers", s:2, l:"League One", t:"men_club"},
+        {n:"Peterborough United", s:2, l:"League One", t:"men_club"},
+        {n:"Lincoln City", s:2, l:"League One", t:"men_club"},
+        {n:"Stockport County", s:2, l:"League One", t:"men_club"},
+        {n:"Mansfield Town", s:2, l:"League One", t:"men_club"},
+        {n:"Bristol Rovers", s:2, l:"League One", t:"men_club"},
+        {n:"Leyton Orient", s:2, l:"League One", t:"men_club"},
+        {n:"Exeter City", s:2, l:"League One", t:"men_club"},
+        {n:"Northampton Town", s:2, l:"League One", t:"men_club"},
+        {n:"Shrewsbury Town", s:2, l:"League One", t:"men_club"},
+        {n:"Cambridge United", s:2, l:"League One", t:"men_club"},
+        {n:"Burton Albion", s:2, l:"League One", t:"men_club"},
+        {n:"Crawley Town", s:2, l:"League One", t:"men_club"},
+        // --- ENGLAND (League Two) ---
+        {n:"MK Dons", s:2, l:"League Two", t:"men_club"},
+        {n:"Bradford City", s:2, l:"League Two", t:"men_club"},
+        {n:"Doncaster Rovers", s:2, l:"League Two", t:"men_club"},
+        {n:"Salford City", s:2, l:"League Two", t:"men_club"},
+        {n:"Carlisle United", s:1.5, l:"League Two", t:"men_club"},
+        {n:"Fleetwood Town", s:1.5, l:"League Two", t:"men_club"},
+        {n:"Port Vale", s:1.5, l:"League Two", t:"men_club"},
+        {n:"Cheltenham Town", s:1.5, l:"League Two", t:"men_club"},
+        {n:"Gillingham", s:1.5, l:"League Two", t:"men_club"},
+        {n:"Chesterfield", s:1.5, l:"League Two", t:"men_club"},
+        {n:"Notts County", s:1.5, l:"League Two", t:"men_club"},
+        {n:"AFC Wimbledon", s:1.5, l:"League Two", t:"men_club"},
+        {n:"Walsall", s:1.5, l:"League Two", t:"men_club"},
+        {n:"Crewe Alexandra", s:1.5, l:"League Two", t:"men_club"},
+        {n:"Barrow", s:1.5, l:"League Two", t:"men_club"},
+        {n:"Tranmere Rovers", s:1.5, l:"League Two", t:"men_club"},
+        {n:"Swindon Town", s:1.5, l:"League Two", t:"men_club"},
+        {n:"Newport County", s:1.5, l:"League Two", t:"men_club"},
+        {n:"Accrington Stanley", s:1.5, l:"League Two", t:"men_club"},
+        {n:"Grimsby Town", s:1.5, l:"League Two", t:"men_club"},
+        {n:"Colchester United", s:1.5, l:"League Two", t:"men_club"},
+        {n:"Harrogate Town", s:1.5, l:"League Two", t:"men_club"},
+        {n:"Morecambe", s:1.5, l:"League Two", t:"men_club"},
+        {n:"Bromley", s:1.5, l:"League Two", t:"men_club"},
+
+        // --- SPAIN (LaLiga) ---
+        {n:"Real Madrid", s:5, l:"LaLiga", t:"men_club"},
+        {n:"FC Barcelona", s:5, l:"LaLiga", t:"men_club"},
+        {n:"Atlético Madrid", s:4.5, l:"LaLiga", t:"men_club"},
+        {n:"Real Sociedad", s:4, l:"LaLiga", t:"men_club"},
+        {n:"Athletic Club", s:4, l:"LaLiga", t:"men_club"},
+        {n:"Villarreal", s:4, l:"LaLiga", t:"men_club"},
+        {n:"Real Betis", s:4, l:"LaLiga", t:"men_club"},
+        {n:"Sevilla", s:4, l:"LaLiga", t:"men_club"},
+        {n:"Girona", s:3.5, l:"LaLiga", t:"men_club"},
+        {n:"Valencia", s:3.5, l:"LaLiga", t:"men_club"},
+        {n:"Celta Vigo", s:3.5, l:"LaLiga", t:"men_club"},
+        {n:"Osasuna", s:3.5, l:"LaLiga", t:"men_club"},
+        {n:"Getafe", s:3, l:"LaLiga", t:"men_club"},
+        {n:"Rayo Vallecano", s:3, l:"LaLiga", t:"men_club"},
+        {n:"Mallorca", s:3, l:"LaLiga", t:"men_club"},
+        {n:"Alavés", s:3, l:"LaLiga", t:"men_club"},
+        {n:"Las Palmas", s:3, l:"LaLiga", t:"men_club"},
+        {n:"Espanyol", s:3, l:"LaLiga", t:"men_club"},
+        {n:"Valladolid", s:3, l:"LaLiga", t:"men_club"},
+        {n:"Leganés", s:3, l:"LaLiga", t:"men_club"},
+        // --- SPAIN (Hypermotion) ---
+        {n:"Almería", s:3, l:"LaLiga 2", t:"men_club"},
+        {n:"Granada", s:3, l:"LaLiga 2", t:"men_club"},
+        {n:"Cádiz", s:3, l:"LaLiga 2", t:"men_club"},
+        {n:"Zaragoza", s:2.5, l:"LaLiga 2", t:"men_club"},
+        {n:"Levante", s:2.5, l:"LaLiga 2", t:"men_club"},
+        {n:"Eibar", s:2.5, l:"LaLiga 2", t:"men_club"},
+        {n:"Oviedo", s:2.5, l:"LaLiga 2", t:"men_club"},
+        {n:"Sporting Gijón", s:2.5, l:"LaLiga 2", t:"men_club"},
+        {n:"Elche", s:2.5, l:"LaLiga 2", t:"men_club"},
+        {n:"Tenerife", s:2.5, l:"LaLiga 2", t:"men_club"},
+        {n:"Albacete", s:2.5, l:"LaLiga 2", t:"men_club"},
+        {n:"Burgos", s:2.5, l:"LaLiga 2", t:"men_club"},
+        {n:"Racing Santander", s:2.5, l:"LaLiga 2", t:"men_club"},
+        {n:"Huesca", s:2.5, l:"LaLiga 2", t:"men_club"},
+        {n:"Mirandés", s:2.5, l:"LaLiga 2", t:"men_club"},
+        {n:"Cartagena", s:2.5, l:"LaLiga 2", t:"men_club"},
+        {n:"Eldense", s:2.5, l:"LaLiga 2", t:"men_club"},
+        {n:"Racing Ferrol", s:2.5, l:"LaLiga 2", t:"men_club"},
+        {n:"Córdoba", s:2.5, l:"LaLiga 2", t:"men_club"},
+        {n:"Málaga", s:2.5, l:"LaLiga 2", t:"men_club"},
+        {n:"Castellón", s:2.5, l:"LaLiga 2", t:"men_club"},
+        {n:"Deportivo La Coruña", s:2.5, l:"LaLiga 2", t:"men_club"},
+
+        // --- GERMANY (Bundesliga) ---
+        {n:"Bayern Munich", s:5, l:"Bundesliga", t:"men_club"},
+        {n:"Bayer Leverkusen", s:4.5, l:"Bundesliga", t:"men_club"},
+        {n:"Borussia Dortmund", s:4.5, l:"Bundesliga", t:"men_club"},
+        {n:"RB Leipzig", s:4.5, l:"Bundesliga", t:"men_club"},
+        {n:"Stuttgart", s:4, l:"Bundesliga", t:"men_club"},
+        {n:"Eintracht Frankfurt", s:4, l:"Bundesliga", t:"men_club"},
+        {n:"Freiburg", s:3.5, l:"Bundesliga", t:"men_club"},
+        {n:"Hoffenheim", s:3.5, l:"Bundesliga", t:"men_club"},
+        {n:"Wolfsburg", s:3.5, l:"Bundesliga", t:"men_club"},
+        {n:"Borussia Mönchengladbach", s:3.5, l:"Bundesliga", t:"men_club"},
+        {n:"Werder Bremen", s:3, l:"Bundesliga", t:"men_club"},
+        {n:"Mainz", s:3, l:"Bundesliga", t:"men_club"},
+        {n:"Augsburg", s:3, l:"Bundesliga", t:"men_club"},
+        {n:"Union Berlin", s:3, l:"Bundesliga", t:"men_club"},
+        {n:"Bochum", s:3, l:"Bundesliga", t:"men_club"},
+        {n:"Heidenheim", s:3, l:"Bundesliga", t:"men_club"},
+        {n:"St. Pauli", s:3, l:"Bundesliga", t:"men_club"},
+        {n:"Holstein Kiel", s:3, l:"Bundesliga", t:"men_club"},
+        // --- GERMANY (2. Bundesliga) ---
+        {n:"FC Köln", s:3, l:"2. Bundesliga", t:"men_club"},
+        {n:"Hamburg", s:2.5, l:"2. Bundesliga", t:"men_club"},
+        {n:"Schalke", s:2.5, l:"2. Bundesliga", t:"men_club"},
+        {n:"Hertha Berlin", s:2.5, l:"2. Bundesliga", t:"men_club"},
+        {n:"Fortuna Düsseldorf", s:2.5, l:"2. Bundesliga", t:"men_club"},
+        {n:"Hannover 96", s:2.5, l:"2. Bundesliga", t:"men_club"},
+        {n:"Karlsruhe", s:2.5, l:"2. Bundesliga", t:"men_club"},
+        {n:"Paderborn", s:2.5, l:"2. Bundesliga", t:"men_club"},
+        {n:"Greuther Fürth", s:2.5, l:"2. Bundesliga", t:"men_club"},
+        {n:"Nürnberg", s:2.5, l:"2. Bundesliga", t:"men_club"},
+        {n:"Kaiserslautern", s:2.5, l:"2. Bundesliga", t:"men_club"},
+        {n:"Magdeburg", s:2.5, l:"2. Bundesliga", t:"men_club"},
+        {n:"Darmstadt", s:2.5, l:"2. Bundesliga", t:"men_club"},
+        {n:"Elversberg", s:2.5, l:"2. Bundesliga", t:"men_club"},
+        {n:"Braunschweig", s:2.5, l:"2. Bundesliga", t:"men_club"},
+        {n:"Ulm", s:2.5, l:"2. Bundesliga", t:"men_club"},
+        {n:"Münster", s:2.5, l:"2. Bundesliga", t:"men_club"},
+        {n:"Jahn Regensburg", s:2.5, l:"2. Bundesliga", t:"men_club"},
+        // --- GERMANY (3. Liga) ---
+        {n:"Dynamo Dresden", s:2, l:"3. Liga", t:"men_club"},
+        {n:"Arminia Bielefeld", s:2, l:"3. Liga", t:"men_club"},
+        {n:"1860 Munich", s:2, l:"3. Liga", t:"men_club"},
+        {n:"Hansa Rostock", s:2, l:"3. Liga", t:"men_club"},
+        {n:"Rot-Weiss Essen", s:2, l:"3. Liga", t:"men_club"},
+        {n:"Saarbrücken", s:2, l:"3. Liga", t:"men_club"},
+        {n:"Ingolstadt", s:2, l:"3. Liga", t:"men_club"},
+        {n:"Aue", s:2, l:"3. Liga", t:"men_club"},
+        {n:"Sandhausen", s:2, l:"3. Liga", t:"men_club"},
+        {n:"Verl", s:2, l:"3. Liga", t:"men_club"},
+        {n:"Viktoria Köln", s:2, l:"3. Liga", t:"men_club"},
+        {n:"Unterhaching", s:2, l:"3. Liga", t:"men_club"},
+        {n:"Alemannia Aachen", s:2, l:"3. Liga", t:"men_club"},
+        {n:"Energie Cottbus", s:2, l:"3. Liga", t:"men_club"},
+        {n:"Waldhof Mannheim", s:2, l:"3. Liga", t:"men_club"},
+        {n:"Wehen Wiesbaden", s:2, l:"3. Liga", t:"men_club"},
+        {n:"Osnabrück", s:2, l:"3. Liga", t:"men_club"},
+        {n:"Dortmund II", s:2, l:"3. Liga", t:"men_club"},
+        {n:"Stuttgart II", s:2, l:"3. Liga", t:"men_club"},
+        {n:"Hannover II", s:2, l:"3. Liga", t:"men_club"},
+
+        // --- ITALY (Serie A) ---
+        {n:"Inter", s:5, l:"Serie A", t:"men_club"},
+        {n:"Juventus", s:4.5, l:"Serie A", t:"men_club"},
+        {n:"AC Milan", s:4.5, l:"Serie A", t:"men_club"},
+        {n:"Napoli", s:4, l:"Serie A", t:"men_club"},
+        {n:"Roma", s:4, l:"Serie A", t:"men_club"},
+        {n:"Atalanta", s:4, l:"Serie A", t:"men_club"},
+        {n:"Lazio", s:3.5, l:"Serie A", t:"men_club"},
+        {n:"Fiorentina", s:3.5, l:"Serie A", t:"men_club"},
+        {n:"Bologna", s:3.5, l:"Serie A", t:"men_club"},
+        {n:"Torino", s:3.5, l:"Serie A", t:"men_club"},
+        {n:"Genoa", s:3, l:"Serie A", t:"men_club"},
+        {n:"Udinese", s:3, l:"Serie A", t:"men_club"},
+        {n:"Monza", s:3, l:"Serie A", t:"men_club"},
+        {n:"Verona", s:3, l:"Serie A", t:"men_club"},
+        {n:"Lecce", s:3, l:"Serie A", t:"men_club"},
+        {n:"Parma", s:3, l:"Serie A", t:"men_club"},
+        {n:"Como", s:3, l:"Serie A", t:"men_club"},
+        {n:"Venezia", s:3, l:"Serie A", t:"men_club"},
+        {n:"Cagliari", s:3, l:"Serie A", t:"men_club"},
+        {n:"Empoli", s:3, l:"Serie A", t:"men_club"},
+        // --- ITALY (Serie B) ---
+        {n:"Sassuolo", s:3, l:"Serie B", t:"men_club"},
+        {n:"Salernitana", s:3, l:"Serie B", t:"men_club"},
+        {n:"Sampdoria", s:2.5, l:"Serie B", t:"men_club"},
+        {n:"Palermo", s:2.5, l:"Serie B", t:"men_club"},
+        {n:"Cremonese", s:2.5, l:"Serie B", t:"men_club"},
+        {n:"Pisa", s:2.5, l:"Serie B", t:"men_club"},
+        {n:"Spezia", s:2.5, l:"Serie B", t:"men_club"},
+        {n:"Brescia", s:2.5, l:"Serie B", t:"men_club"},
+        {n:"Bari", s:2.5, l:"Serie B", t:"men_club"},
+        {n:"Catanzaro", s:2.5, l:"Serie B", t:"men_club"},
+        {n:"Modena", s:2.5, l:"Serie B", t:"men_club"},
+        {n:"Südtirol", s:2.5, l:"Serie B", t:"men_club"},
+        {n:"Reggiana", s:2.5, l:"Serie B", t:"men_club"},
+        {n:"Cosenza", s:2.5, l:"Serie B", t:"men_club"},
+        {n:"Mantova", s:2.5, l:"Serie B", t:"men_club"},
+        {n:"Cesena", s:2.5, l:"Serie B", t:"men_club"},
+        {n:"Juve Stabia", s:2.5, l:"Serie B", t:"men_club"},
+        {n:"Carrarese", s:2.5, l:"Serie B", t:"men_club"},
+        {n:"Frosinone", s:2.5, l:"Serie B", t:"men_club"},
+
+        // --- FRANCE (Ligue 1) ---
+        {n:"Paris Saint-Germain", s:4.5, l:"Ligue 1", t:"men_club"},
+        {n:"Monaco", s:4, l:"Ligue 1", t:"men_club"},
+        {n:"Marseille", s:4, l:"Ligue 1", t:"men_club"},
+        {n:"Lyon", s:4, l:"Ligue 1", t:"men_club"},
+        {n:"Lille", s:4, l:"Ligue 1", t:"men_club"},
+        {n:"Lens", s:3.5, l:"Ligue 1", t:"men_club"},
+        {n:"Nice", s:3.5, l:"Ligue 1", t:"men_club"},
+        {n:"Rennes", s:3.5, l:"Ligue 1", t:"men_club"},
+        {n:"Brest", s:3, l:"Ligue 1", t:"men_club"},
+        {n:"Reims", s:3, l:"Ligue 1", t:"men_club"},
+        {n:"Montpellier", s:3, l:"Ligue 1", t:"men_club"},
+        {n:"Strasbourg", s:3, l:"Ligue 1", t:"men_club"},
+        {n:"Nantes", s:3, l:"Ligue 1", t:"men_club"},
+        {n:"Toulouse", s:3, l:"Ligue 1", t:"men_club"},
+        {n:"Auxerre", s:3, l:"Ligue 1", t:"men_club"},
+        {n:"Saint-Étienne", s:3, l:"Ligue 1", t:"men_club"},
+        {n:"Angers", s:3, l:"Ligue 1", t:"men_club"},
+        {n:"Le Havre", s:3, l:"Ligue 1", t:"men_club"},
+
+        // --- PORTUGAL ---
+        {n:"SL Benfica", s:4.5, l:"Liga Portugal", t:"men_club"},
+        {n:"FC Porto", s:4.5, l:"Liga Portugal", t:"men_club"},
+        {n:"Sporting CP", s:4.5, l:"Liga Portugal", t:"men_club"},
+        {n:"SC Braga", s:3.5, l:"Liga Portugal", t:"men_club"},
+        {n:"Vitória SC", s:3.5, l:"Liga Portugal", t:"men_club"},
+        {n:"Famalicão", s:3, l:"Liga Portugal", t:"men_club"},
+        {n:"Boavista", s:3, l:"Liga Portugal", t:"men_club"},
+        {n:"Gil Vicente", s:3, l:"Liga Portugal", t:"men_club"},
+        {n:"Estoril Praia", s:3, l:"Liga Portugal", t:"men_club"},
+        {n:"Rio Ave", s:3, l:"Liga Portugal", t:"men_club"},
+        {n:"Casa Pia", s:2.5, l:"Liga Portugal", t:"men_club"},
+        {n:"Moreirense", s:2.5, l:"Liga Portugal", t:"men_club"},
+        {n:"Farense", s:2.5, l:"Liga Portugal", t:"men_club"},
+        {n:"Arouca", s:2.5, l:"Liga Portugal", t:"men_club"},
+        {n:"Estrela da Amadora", s:2.5, l:"Liga Portugal", t:"men_club"},
+        {n:"Nacional", s:2.5, l:"Liga Portugal", t:"men_club"},
+        {n:"Santa Clara", s:2.5, l:"Liga Portugal", t:"men_club"},
+        {n:"AVS Futebol SAD", s:2.5, l:"Liga Portugal", t:"men_club"},
+
+        // --- NETHERLANDS ---
+        {n:"PSV Eindhoven", s:4.5, l:"Eredivisie", t:"men_club"},
+        {n:"Feyenoord", s:4.5, l:"Eredivisie", t:"men_club"},
+        {n:"Ajax", s:4, l:"Eredivisie", t:"men_club"},
+        {n:"AZ Alkmaar", s:3, l:"Eredivisie", t:"men_club"},
+        {n:"FC Twente", s:3, l:"Eredivisie", t:"men_club"},
+        {n:"FC Utrecht", s:3, l:"Eredivisie", t:"men_club"},
+        {n:"Sparta Rotterdam", s:2.5, l:"Eredivisie", t:"men_club"},
+        {n:"NEC Nijmegen", s:2.5, l:"Eredivisie", t:"men_club"},
+        {n:"Heerenveen", s:2.5, l:"Eredivisie", t:"men_club"},
+        {n:"Go Ahead Eagles", s:2.5, l:"Eredivisie", t:"men_club"},
+        {n:"Fortuna Sittard", s:2.5, l:"Eredivisie", t:"men_club"},
+        {n:"PEC Zwolle", s:2.5, l:"Eredivisie", t:"men_club"},
+        {n:"Heracles Almelo", s:2.5, l:"Eredivisie", t:"men_club"},
+        {n:"Almere City", s:2.5, l:"Eredivisie", t:"men_club"},
+        {n:"RKC Waalwijk", s:2, l:"Eredivisie", t:"men_club"},
+        {n:"Willem II", s:2, l:"Eredivisie", t:"men_club"},
+        {n:"NAC Breda", s:2, l:"Eredivisie", t:"men_club"},
+        {n:"FC Groningen", s:2, l:"Eredivisie", t:"men_club"},
+
+        // --- BELGIUM ---
+        {n:"Club Brugge", s:3.5, l:"Pro League", t:"men_club"},
+        {n:"Anderlecht", s:3.5, l:"Pro League", t:"men_club"},
+        {n:"Union Saint-Gilloise", s:3.5, l:"Pro League", t:"men_club"},
+        {n:"Genk", s:3.5, l:"Pro League", t:"men_club"},
+        {n:"Royal Antwerp", s:3, l:"Pro League", t:"men_club"},
+        {n:"Gent", s:3, l:"Pro League", t:"men_club"},
+        {n:"Cercle Brugge", s:3, l:"Pro League", t:"men_club"},
+        {n:"Mechelen", s:2.5, l:"Pro League", t:"men_club"},
+        {n:"Sint-Truiden", s:2.5, l:"Pro League", t:"men_club"},
+        {n:"Charleroi", s:2.5, l:"Pro League", t:"men_club"},
+        {n:"Standard Liège", s:2.5, l:"Pro League", t:"men_club"},
+        {n:"OH Leuven", s:2.5, l:"Pro League", t:"men_club"},
+        {n:"Westerlo", s:2.5, l:"Pro League", t:"men_club"},
+        {n:"Kortrijk", s:2.5, l:"Pro League", t:"men_club"},
+        {n:"Beerschot", s:2.5, l:"Pro League", t:"men_club"},
+
+        // --- TURKEY ---
+        {n:"Galatasaray", s:4.5, l:"Süper Lig", t:"men_club"},
+        {n:"Fenerbahçe", s:4.5, l:"Süper Lig", t:"men_club"},
+        {n:"Beşiktaş", s:4, l:"Süper Lig", t:"men_club"},
+        {n:"Trabzonspor", s:4, l:"Süper Lig", t:"men_club"},
+        {n:"Başakşehir", s:3, l:"Süper Lig", t:"men_club"},
+        {n:"Adana Demirspor", s:3, l:"Süper Lig", t:"men_club"},
+        {n:"Samsunspor", s:3, l:"Süper Lig", t:"men_club"},
+        {n:"Sivasspor", s:3, l:"Süper Lig", t:"men_club"},
+        {n:"Kasımpaşa", s:3, l:"Süper Lig", t:"men_club"},
+        {n:"Alanyaspor", s:3, l:"Süper Lig", t:"men_club"},
+        {n:"Antalyaspor", s:3, l:"Süper Lig", t:"men_club"},
+        {n:"Rizespor", s:3, l:"Süper Lig", t:"men_club"},
+        {n:"Kayserispor", s:2.5, l:"Süper Lig", t:"men_club"},
+        {n:"Gaziantep FK", s:2.5, l:"Süper Lig", t:"men_club"},
+        {n:"Konyaspor", s:2.5, l:"Süper Lig", t:"men_club"},
+        {n:"Hatayspor", s:2.5, l:"Süper Lig", t:"men_club"},
+        {n:"Göztepe", s:2.5, l:"Süper Lig", t:"men_club"},
+        {n:"Eyüpspor", s:2.5, l:"Süper Lig", t:"men_club"},
+        {n:"Bodrum FK", s:2.5, l:"Süper Lig", t:"men_club"},
+        {n:"Karagümrük", s:2.5, l:"Süper Lig", t:"men_club"},
+
+        // --- SCOTLAND ---
+        {n:"Celtic", s:4, l:"Premiership", t:"men_club"},
+        {n:"Rangers", s:3.5, l:"Premiership", t:"men_club"},
+        {n:"Hearts", s:2.5, l:"Premiership", t:"men_club"},
+        {n:"Hibernian", s:2.5, l:"Premiership", t:"men_club"},
+        {n:"Aberdeen", s:2.5, l:"Premiership", t:"men_club"},
+        {n:"Kilmarnock", s:2, l:"Premiership", t:"men_club"},
+        {n:"St. Mirren", s:2, l:"Premiership", t:"men_club"},
+        {n:"Dundee FC", s:2, l:"Premiership", t:"men_club"},
+        {n:"Motherwell", s:2, l:"Premiership", t:"men_club"},
+        {n:"Ross County", s:2, l:"Premiership", t:"men_club"},
+        {n:"St. Johnstone", s:2, l:"Premiership", t:"men_club"},
+        {n:"Dundee United", s:2, l:"Premiership", t:"men_club"},
+
+        // --- GREECE ---
+        {n:"Olympiacos", s:4, l:"Super League", t:"men_club"},
+        {n:"PAOK", s:4, l:"Super League", t:"men_club"},
+        {n:"AEK Athens", s:4, l:"Super League", t:"men_club"},
+        {n:"Panathinaikos", s:4, l:"Super League", t:"men_club"},
+        {n:"Aris", s:2.5, l:"Super League", t:"men_club"},
+        {n:"Atromitos", s:2.5, l:"Super League", t:"men_club"},
+        {n:"Volos NFC", s:2.5, l:"Super League", t:"men_club"},
+        {n:"Asteras Tripolis", s:2.5, l:"Super League", t:"men_club"},
+        {n:"OFI Crete", s:2, l:"Super League", t:"men_club"},
+        {n:"Panetolikos", s:2, l:"Super League", t:"men_club"},
+        {n:"PAS Giannina", s:2, l:"Super League", t:"men_club"},
+        {n:"Lamia", s:2, l:"Super League", t:"men_club"},
+        {n:"Panserraikos", s:2, l:"Super League", t:"men_club"},
+        {n:"Kifisia", s:2, l:"Super League", t:"men_club"},
+
+        // --- SWITZERLAND ---
+        {n:"Young Boys", s:3.5, l:"Swiss Super League", t:"men_club"},
+        {n:"Basel", s:3.5, l:"Swiss Super League", t:"men_club"},
+        {n:"Servette", s:3, l:"Swiss Super League", t:"men_club"},
+        {n:"Zürich", s:3, l:"Swiss Super League", t:"men_club"},
+        {n:"Lugano", s:3, l:"Swiss Super League", t:"men_club"},
+        {n:"Luzern", s:2.5, l:"Swiss Super League", t:"men_club"},
+        {n:"St. Gallen", s:2.5, l:"Swiss Super League", t:"men_club"},
+        {n:"Lausanne-Sport", s:2.5, l:"Swiss Super League", t:"men_club"},
+        {n:"Winterthur", s:2.5, l:"Swiss Super League", t:"men_club"},
+        {n:"Yverdon", s:2.5, l:"Swiss Super League", t:"men_club"},
+        {n:"Grasshopper", s:2.5, l:"Swiss Super League", t:"men_club"},
+        {n:"Stade Lausanne", s:2.5, l:"Swiss Super League", t:"men_club"},
+
+        // --- AUSTRIA ---
+        {n:"RB Salzburg", s:3.5, l:"Austria Bundesliga", t:"men_club"},
+        {n:"Sturm Graz", s:3, l:"Austria Bundesliga", t:"men_club"},
+        {n:"LASK", s:3, l:"Austria Bundesliga", t:"men_club"},
+        {n:"Rapid Wien", s:3, l:"Austria Bundesliga", t:"men_club"},
+        {n:"Austria Wien", s:2.5, l:"Austria Bundesliga", t:"men_club"},
+        {n:"Wolfsberger AC", s:2.5, l:"Austria Bundesliga", t:"men_club"},
+        {n:"Hartberg", s:2.5, l:"Austria Bundesliga", t:"men_club"},
+        {n:"Austria Klagenfurt", s:2.5, l:"Austria Bundesliga", t:"men_club"},
+        {n:"Blau-Weiß Linz", s:2.5, l:"Austria Bundesliga", t:"men_club"},
+        {n:"WSG Tirol", s:2.5, l:"Austria Bundesliga", t:"men_club"},
+        {n:"Rheindorf Altach", s:2.5, l:"Austria Bundesliga", t:"men_club"},
+        {n:"Austria Lustenau", s:2.5, l:"Austria Bundesliga", t:"men_club"},
+
+        // --- DENMARK ---
+        {n:"FC Copenhagen", s:3, l:"Superliga", t:"men_club"},
+        {n:"Midtjylland", s:3, l:"Superliga", t:"men_club"},
+        {n:"Brøndby", s:2.5, l:"Superliga", t:"men_club"},
+        {n:"Nordsjælland", s:2.5, l:"Superliga", t:"men_club"},
+        {n:"Aarhus GF", s:2.5, l:"Superliga", t:"men_club"},
+        {n:"Silkeborg", s:2.5, l:"Superliga", t:"men_club"},
+        {n:"Randers", s:2, l:"Superliga", t:"men_club"},
+        {n:"Viborg", s:2, l:"Superliga", t:"men_club"},
+        {n:"Lyngby", s:2, l:"Superliga", t:"men_club"},
+        {n:"Vejle", s:2, l:"Superliga", t:"men_club"},
+        {n:"Hvidovre", s:2, l:"Superliga", t:"men_club"},
+        {n:"OB", s:2, l:"Superliga", t:"men_club"},
+
+        // --- SWEDEN ---
+        {n:"Malmö FF", s:3, l:"Allsvenskan", t:"men_club"},
+        {n:"Djurgården", s:2.5, l:"Allsvenskan", t:"men_club"},
+        {n:"AIK", s:2.5, l:"Allsvenskan", t:"men_club"},
+        {n:"Hammarby", s:2.5, l:"Allsvenskan", t:"men_club"},
+        {n:"Häcken", s:2, l:"Allsvenskan", t:"men_club"},
+        {n:"Elfsborg", s:2, l:"Allsvenskan", t:"men_club"},
+        {n:"IFK Göteborg", s:2, l:"Allsvenskan", t:"men_club"},
+        {n:"Kalmar", s:2, l:"Allsvenskan", t:"men_club"},
+        {n:"Norrköping", s:2, l:"Allsvenskan", t:"men_club"},
+        {n:"Sirius", s:2, l:"Allsvenskan", t:"men_club"},
+        {n:"Värnamo", s:2, l:"Allsvenskan", t:"men_club"},
+        {n:"Brommapojkarna", s:2, l:"Allsvenskan", t:"men_club"},
+        {n:"Halmstad", s:2, l:"Allsvenskan", t:"men_club"},
+        {n:"GAIS", s:2, l:"Allsvenskan", t:"men_club"},
+        {n:"Mjällby", s:2, l:"Allsvenskan", t:"men_club"},
+
+        // --- NORWAY ---
+        {n:"Bodø/Glimt", s:3, l:"Eliteserien", t:"men_club"},
+        {n:"Molde", s:2.5, l:"Eliteserien", t:"men_club"},
+        {n:"Rosenborg", s:2.5, l:"Eliteserien", t:"men_club"},
+        {n:"Brann", s:2, l:"Eliteserien", t:"men_club"},
+        {n:"Viking", s:2, l:"Eliteserien", t:"men_club"},
+        {n:"Lillestrøm", s:2, l:"Eliteserien", t:"men_club"},
+        {n:"Tromsø", s:2, l:"Eliteserien", t:"men_club"},
+        {n:"Sarpsborg", s:2, l:"Eliteserien", t:"men_club"},
+        {n:"Odd", s:2, l:"Eliteserien", t:"men_club"},
+        {n:"Sandefjord", s:2, l:"Eliteserien", t:"men_club"},
+        {n:"HamKam", s:2, l:"Eliteserien", t:"men_club"},
+        {n:"Kristiansund", s:2, l:"Eliteserien", t:"men_club"},
+        {n:"Haugesund", s:2, l:"Eliteserien", t:"men_club"},
+        {n:"Fredrikstad", s:2, l:"Eliteserien", t:"men_club"},
+        {n:"KFUM Oslo", s:2, l:"Eliteserien", t:"men_club"},
+
+        // --- POLAND ---
+        {n:"Legia Warsaw", s:3, l:"Ekstraklasa", t:"men_club"},
+        {n:"Lech Poznań", s:3, l:"Ekstraklasa", t:"men_club"},
+        {n:"Raków", s:2.5, l:"Ekstraklasa", t:"men_club"},
+        {n:"Pogoń Szczecin", s:2.5, l:"Ekstraklasa", t:"men_club"},
+        {n:"Śląsk Wrocław", s:2, l:"Ekstraklasa", t:"men_club"},
+        {n:"Górnik Zabrze", s:2, l:"Ekstraklasa", t:"men_club"},
+        {n:"Cracovia", s:2, l:"Ekstraklasa", t:"men_club"},
+        {n:"Jagiellonia", s:2, l:"Ekstraklasa", t:"men_club"},
+        {n:"Widzew Łódź", s:2, l:"Ekstraklasa", t:"men_club"},
+        {n:"Zagłębie Lubin", s:2, l:"Ekstraklasa", t:"men_club"},
+        {n:"Korona Kielce", s:2, l:"Ekstraklasa", t:"men_club"},
+        {n:"Radomiak", s:2, l:"Ekstraklasa", t:"men_club"},
+        {n:"Piast Gliwice", s:2, l:"Ekstraklasa", t:"men_club"},
+        {n:"Stal Mielec", s:2, l:"Ekstraklasa", t:"men_club"},
+        {n:"ŁKS Łódź", s:2, l:"Ekstraklasa", t:"men_club"},
+        {n:"Puszcza Niepołomice", s:2, l:"Ekstraklasa", t:"men_club"},
+
+        // --- ROMANIA ---
+        {n:"FCSB", s:3, l:"SuperLiga", t:"men_club"},
+        {n:"CFR Cluj", s:3, l:"SuperLiga", t:"men_club"},
+        {n:"Universitatea Craiova", s:2.5, l:"SuperLiga", t:"men_club"},
+        {n:"Rapid Bucharest", s:2.5, l:"SuperLiga", t:"men_club"},
+        {n:"Farul Constanța", s:2, l:"SuperLiga", t:"men_club"},
+        {n:"Sepsi", s:2, l:"SuperLiga", t:"men_club"},
+        {n:"UTA Arad", s:2, l:"SuperLiga", t:"men_club"},
+        {n:"Petrolul", s:2, l:"SuperLiga", t:"men_club"},
+        {n:"Hermannstadt", s:2, l:"SuperLiga", t:"men_club"},
+        {n:"Oțelul Galați", s:2, l:"SuperLiga", t:"men_club"},
+        {n:"Poli Iași", s:2, l:"SuperLiga", t:"men_club"},
+        {n:"FC Voluntari", s:2, l:"SuperLiga", t:"men_club"},
+        {n:"Botoșani", s:2, l:"SuperLiga", t:"men_club"},
+        {n:"Dinamo Bucharest", s:2, l:"SuperLiga", t:"men_club"},
+        {n:"Universitatea Cluj", s:2, l:"SuperLiga", t:"men_club"},
+        {n:"Mioveni", s:2, l:"SuperLiga", t:"men_club"},
+
+        // --- USA / MLS ---
+        {n:"Inter Miami CF", s:4, l:"MLS", t:"men_club"},
+        {n:"LAFC", s:3.5, l:"MLS", t:"men_club"},
+        {n:"LA Galaxy", s:3.5, l:"MLS", t:"men_club"},
+        {n:"Columbus Crew", s:3.5, l:"MLS", t:"men_club"},
+        {n:"Seattle Sounders", s:3.5, l:"MLS", t:"men_club"},
+        {n:"FC Cincinnati", s:3.5, l:"MLS", t:"men_club"},
+        {n:"Atlanta United", s:3, l:"MLS", t:"men_club"},
+        {n:"New York Red Bulls", s:3, l:"MLS", t:"men_club"},
+        {n:"Philadelphia Union", s:3, l:"MLS", t:"men_club"},
+        {n:"Orlando City", s:3, l:"MLS", t:"men_club"},
+        {n:"Houston Dynamo", s:3, l:"MLS", t:"men_club"},
+        {n:"Real Salt Lake", s:3, l:"MLS", t:"men_club"},
+        {n:"Portland Timbers", s:3, l:"MLS", t:"men_club"},
+        {n:"Nashville SC", s:3, l:"MLS", t:"men_club"},
+        {n:"New England Revolution", s:3, l:"MLS", t:"men_club"},
+        {n:"New York City FC", s:3, l:"MLS", t:"men_club"},
+        {n:"St. Louis City SC", s:3, l:"MLS", t:"men_club"},
+        {n:"Vancouver Whitecaps", s:3, l:"MLS", t:"men_club"},
+        {n:"Minnesota United", s:3, l:"MLS", t:"men_club"},
+        {n:"Charlotte FC", s:2.5, l:"MLS", t:"men_club"},
+        {n:"CF Montréal", s:2.5, l:"MLS", t:"men_club"},
+        {n:"Toronto FC", s:2.5, l:"MLS", t:"men_club"},
+        {n:"Austin FC", s:2.5, l:"MLS", t:"men_club"},
+        {n:"Chicago Fire", s:2.5, l:"MLS", t:"men_club"},
+        {n:"FC Dallas", s:2.5, l:"MLS", t:"men_club"},
+        {n:"Sporting Kansas City", s:2.5, l:"MLS", t:"men_club"},
+        {n:"San Jose Earthquakes", s:2.5, l:"MLS", t:"men_club"},
+        {n:"Colorado Rapids", s:2.5, l:"MLS", t:"men_club"},
+        {n:"DC United", s:2.5, l:"MLS", t:"men_club"},
+        {n:"San Diego FC", s:2.5, l:"MLS", t:"men_club"},
+
+        // --- MEXICO ---
+        {n:"Club América", s:4, l:"Liga MX", t:"men_club"},
+        {n:"Monterrey", s:3.5, l:"Liga MX", t:"men_club"},
+        {n:"Tigres UANL", s:3.5, l:"Liga MX", t:"men_club"},
+        {n:"Chivas Guadalajara", s:3, l:"Liga MX", t:"men_club"},
+        {n:"Cruz Azul", s:3, l:"Liga MX", t:"men_club"},
+        {n:"Toluca", s:3, l:"Liga MX", t:"men_club"},
+        {n:"Pachuca", s:3, l:"Liga MX", t:"men_club"},
+        {n:"León", s:2.5, l:"Liga MX", t:"men_club"},
+        {n:"Santos Laguna", s:2.5, l:"Liga MX", t:"men_club"},
+        {n:"Pumas UNAM", s:2.5, l:"Liga MX", t:"men_club"},
+        {n:"Tijuana", s:2.5, l:"Liga MX", t:"men_club"},
+        {n:"Atlas", s:2.5, l:"Liga MX", t:"men_club"},
+        {n:"Querétaro", s:2.5, l:"Liga MX", t:"men_club"},
+        {n:"Necaxa", s:2.5, l:"Liga MX", t:"men_club"},
+        {n:"Puebla", s:2.5, l:"Liga MX", t:"men_club"},
+        {n:"Atlético San Luis", s:2.5, l:"Liga MX", t:"men_club"},
+        {n:"Mazatlán", s:2.5, l:"Liga MX", t:"men_club"},
+
+        // --- ARGENTINA ---
+        {n:"River Plate", s:4, l:"Liga Profesional", t:"men_club"},
+        {n:"Boca Juniors", s:4, l:"Liga Profesional", t:"men_club"},
+        {n:"Racing Club", s:3.5, l:"Liga Profesional", t:"men_club"},
+        {n:"Independiente", s:3.5, l:"Liga Profesional", t:"men_club"},
+        {n:"San Lorenzo", s:3.5, l:"Liga Profesional", t:"men_club"},
+        {n:"Estudiantes", s:3.5, l:"Liga Profesional", t:"men_club"},
+        {n:"Talleres", s:3.5, l:"Liga Profesional", t:"men_club"},
+        {n:"Rosario Central", s:3, l:"Liga Profesional", t:"men_club"},
+        {n:"Newell’s Old Boys", s:3, l:"Liga Profesional", t:"men_club"},
+        {n:"Argentinos Juniors", s:3, l:"Liga Profesional", t:"men_club"},
+        {n:"Lanús", s:3, l:"Liga Profesional", t:"men_club"},
+        {n:"Vélez Sarsfield", s:3, l:"Liga Profesional", t:"men_club"},
+        {n:"Defensa y Justicia", s:3, l:"Liga Profesional", t:"men_club"},
+        {n:"Huracán", s:3, l:"Liga Profesional", t:"men_club"},
+        {n:"Godoy Cruz", s:3, l:"Liga Profesional", t:"men_club"},
+        {n:"Belgrano", s:3, l:"Liga Profesional", t:"men_club"},
+        {n:"Platense", s:3, l:"Liga Profesional", t:"men_club"},
+        {n:"Banfield", s:2.5, l:"Liga Profesional", t:"men_club"},
+        {n:"Instituto", s:2.5, l:"Liga Profesional", t:"men_club"},
+        {n:"Central Córdoba", s:2.5, l:"Liga Profesional", t:"men_club"},
+        {n:"Colón", s:2.5, l:"Liga Profesional", t:"men_club"},
+        {n:"Gimnasia La Plata", s:2.5, l:"Liga Profesional", t:"men_club"},
+        {n:"Unión", s:2.5, l:"Liga Profesional", t:"men_club"},
+        {n:"Sarmiento", s:2.5, l:"Liga Profesional", t:"men_club"},
+        {n:"Tigre", s:2.5, l:"Liga Profesional", t:"men_club"},
+
+        // --- BRAZIL ---
+        {n:"Flamengo", s:4.5, l:"CONMEBOL", t:"men_club"},
+        {n:"Palmeiras", s:4.5, l:"CONMEBOL", t:"men_club"},
+        {n:"Atlético Mineiro", s:4, l:"CONMEBOL", t:"men_club"},
+        {n:"Fluminense", s:4, l:"CONMEBOL", t:"men_club"},
+        {n:"São Paulo", s:4, l:"CONMEBOL", t:"men_club"},
+        {n:"Grêmio", s:3.5, l:"CONMEBOL", t:"men_club"},
+        {n:"Internacional", s:3.5, l:"CONMEBOL", t:"men_club"},
+        {n:"Botafogo", s:3.5, l:"CONMEBOL", t:"men_club"},
+        {n:"Corinthians", s:3, l:"CONMEBOL", t:"men_club"},
+        {n:"Santos", s:3, l:"CONMEBOL", t:"men_club"},
+
+        // --- COLOMBIA ---
+        {n:"Atlético Nacional", s:3, l:"Primera A", t:"men_club"},
+        {n:"Millonarios", s:3, l:"Primera A", t:"men_club"},
+        {n:"América de Cali", s:2.5, l:"Primera A", t:"men_club"},
+        {n:"Junior", s:2.5, l:"Primera A", t:"men_club"},
+        {n:"Deportes Tolima", s:2.5, l:"Primera A", t:"men_club"},
+        {n:"Independiente Medellín", s:2.5, l:"Primera A", t:"men_club"},
+        {n:"Santa Fe", s:2, l:"Primera A", t:"men_club"},
+        {n:"Once Caldas", s:2, l:"Primera A", t:"men_club"},
+        {n:"Deportivo Cali", s:2, l:"Primera A", t:"men_club"},
+        {n:"La Equidad", s:2, l:"Primera A", t:"men_club"},
+        {n:"Alianza FC", s:2, l:"Primera A", t:"men_club"},
+        {n:"Atlético Bucaramanga", s:2, l:"Primera A", t:"men_club"},
+        {n:"Jaguares", s:2, l:"Primera A", t:"men_club"},
+        {n:"Envigado", s:2, l:"Primera A", t:"men_club"},
+        {n:"Pereira", s:2, l:"Primera A", t:"men_club"},
+        {n:"Boyacá Chicó", s:2, l:"Primera A", t:"men_club"},
+        {n:"Patriotas", s:2, l:"Primera A", t:"men_club"},
+        {n:"Fortaleza CEIF", s:2, l:"Primera A", t:"men_club"},
+        {n:"Águilas Doradas", s:2, l:"Primera A", t:"men_club"},
+
+        // --- CHILE ---
+        {n:"Colo-Colo", s:3, l:"Primera División", t:"men_club"},
+        {n:"Universidad de Chile", s:2.5, l:"Primera División", t:"men_club"},
+        {n:"Universidad Católica", s:2.5, l:"Primera División", t:"men_club"},
+        {n:"Unión Española", s:2, l:"Primera División", t:"men_club"},
+        {n:"Everton de Viña", s:2, l:"Primera División", t:"men_club"},
+        {n:"Palestino", s:2, l:"Primera División", t:"men_club"},
+        {n:"Audax Italiano", s:2, l:"Primera División", t:"men_club"},
+        {n:"Cobresal", s:2, l:"Primera División", t:"men_club"},
+        {n:"Huachipato", s:2, l:"Primera División", t:"men_club"},
+        {n:"O’Higgins", s:2, l:"Primera División", t:"men_club"},
+        {n:"Coquimbo Unido", s:2, l:"Primera División", t:"men_club"},
+        {n:"Ñublense", s:2, l:"Primera División", t:"men_club"},
+        {n:"Deportes Iquique", s:2, l:"Primera División", t:"men_club"},
+        {n:"Cobreloa", s:2, l:"Primera División", t:"men_club"},
+        {n:"Deportes Copiapó", s:2, l:"Primera División", t:"men_club"},
+
+        // --- SAUDI ARABIA ---
+        {n:"Al-Hilal", s:4.5, l:"ROSHN League", t:"men_club"},
+        {n:"Al-Nassr", s:4, l:"ROSHN League", t:"men_club"},
+        {n:"Al-Ittihad", s:4, l:"ROSHN League", t:"men_club"},
+        {n:"Al-Ahli", s:4, l:"ROSHN League", t:"men_club"},
+        {n:"Al-Ettifaq", s:3, l:"ROSHN League", t:"men_club"},
+        {n:"Al-Shabab", s:3, l:"ROSHN League", t:"men_club"},
+        {n:"Al-Taawoun", s:3, l:"ROSHN League", t:"men_club"},
+        {n:"Al-Fateh", s:2.5, l:"ROSHN League", t:"men_club"},
+        {n:"Damac", s:2.5, l:"ROSHN League", t:"men_club"},
+        {n:"Al-Fayha", s:2.5, l:"ROSHN League", t:"men_club"},
+        {n:"Al-Khaleej", s:2.5, l:"ROSHN League", t:"men_club"},
+        {n:"Al-Riyadh", s:2.5, l:"ROSHN League", t:"men_club"},
+        {n:"Al-Okhdood", s:2.5, l:"ROSHN League", t:"men_club"},
+        {n:"Al-Raed", s:2.5, l:"ROSHN League", t:"men_club"},
+        {n:"Al-Wehda", s:2.5, l:"ROSHN League", t:"men_club"},
+        {n:"Al-Qadsiah", s:2.5, l:"ROSHN League", t:"men_club"},
+
+        // --- JAPAN ---
+        {n:"Kawasaki Frontale", s:3.5, l:"J1 League", t:"men_club"},
+        {n:"Yokohama F. Marinos", s:3, l:"J1 League", t:"men_club"},
+        {n:"Urawa Red Diamonds", s:3, l:"J1 League", t:"men_club"},
+        {n:"Vissel Kobe", s:3, l:"J1 League", t:"men_club"},
+        {n:"Kashima Antlers", s:2.5, l:"J1 League", t:"men_club"},
+        {n:"FC Tokyo", s:2.5, l:"J1 League", t:"men_club"},
+        {n:"Gamba Osaka", s:2.5, l:"J1 League", t:"men_club"},
+        {n:"Cerezo Osaka", s:2.5, l:"J1 League", t:"men_club"},
+        {n:"Nagoya Grampus", s:2.5, l:"J1 League", t:"men_club"},
+        {n:"Sanfrecce Hiroshima", s:2.5, l:"J1 League", t:"men_club"},
+        {n:"Kashiwa Reysol", s:2.5, l:"J1 League", t:"men_club"},
+        {n:"Shonan Bellmare", s:2, l:"J1 League", t:"men_club"},
+        {n:"Albirex Niigata", s:2, l:"J1 League", t:"men_club"},
+        {n:"Sagan Tosu", s:2, l:"J1 League", t:"men_club"},
+        {n:"Avispa Fukuoka", s:2, l:"J1 League", t:"men_club"},
+        {n:"Kyoto Sanga", s:2, l:"J1 League", t:"men_club"},
+        {n:"Júbilo Iwata", s:2, l:"J1 League", t:"men_club"},
+        {n:"Consadole Sapporo", s:2, l:"J1 League", t:"men_club"},
+        {n:"Machida Zelvia", s:2, l:"J1 League", t:"men_club"},
+
+        // --- SOUTH KOREA ---
+        {n:"Ulsan HD", s:3, l:"K League 1", t:"men_club"},
+        {n:"Jeonbuk Hyundai Motors", s:3, l:"K League 1", t:"men_club"},
+        {n:"Pohang Steelers", s:2.5, l:"K League 1", t:"men_club"},
+        {n:"FC Seoul", s:2.5, l:"K League 1", t:"men_club"},
+        {n:"Suwon FC", s:2.5, l:"K League 1", t:"men_club"},
+        {n:"Jeju United", s:2, l:"K League 1", t:"men_club"},
+        {n:"Daegu FC", s:2, l:"K League 1", t:"men_club"},
+        {n:"Incheon United", s:2, l:"K League 1", t:"men_club"},
+        {n:"Daejeon Hana Citizen", s:2, l:"K League 1", t:"men_club"},
+        {n:"Gwangju FC", s:2, l:"K League 1", t:"men_club"},
+        {n:"Gangwon FC", s:2, l:"K League 1", t:"men_club"},
+        {n:"Gimcheon Sangmu", s:2, l:"K League 1", t:"men_club"},
+
+        // --- CHINA ---
+        {n:"Shanghai Port", s:3, l:"CSL", t:"men_club"},
+        {n:"Shanghai Shenhua", s:2.5, l:"CSL", t:"men_club"},
+        {n:"Beijing Guoan", s:2.5, l:"CSL", t:"men_club"},
+        {n:"Shandong Taishan", s:2, l:"CSL", t:"men_club"},
+        {n:"Wuhan Three Towns", s:2, l:"CSL", t:"men_club"},
+        {n:"Chengdu Rongcheng", s:2, l:"CSL", t:"men_club"},
+        {n:"Tianjin Jinmen Tiger", s:2, l:"CSL", t:"men_club"},
+        {n:"Henan", s:2, l:"CSL", t:"men_club"},
+        {n:"Zhejiang", s:2, l:"CSL", t:"men_club"},
+        {n:"Qingdao West Coast", s:2, l:"CSL", t:"men_club"},
+        {n:"Qingdao Hainiu", s:2, l:"CSL", t:"men_club"},
+        {n:"Shenzhen Peng City", s:2, l:"CSL", t:"men_club"},
+        {n:"Meizhou Hakka", s:2, l:"CSL", t:"men_club"},
+        {n:"Nantong Zhiyun", s:2, l:"CSL", t:"men_club"},
+        {n:"Changchun Yatai", s:2, l:"CSL", t:"men_club"},
+        {n:"Cangzhou Mighty Lions", s:2, l:"CSL", t:"men_club"},
+
+        // --- INDIA ---
+        {n:"Mumbai City FC", s:2.5, l:"ISL", t:"men_club"},
+        {n:"Mohun Bagan SG", s:2, l:"ISL", t:"men_club"},
+        {n:"Bengaluru FC", s:2, l:"ISL", t:"men_club"},
+        {n:"FC Goa", s:2, l:"ISL", t:"men_club"},
+        {n:"Kerala Blasters", s:1.5, l:"ISL", t:"men_club"},
+        {n:"Chennaiyin FC", s:1.5, l:"ISL", t:"men_club"},
+        {n:"Hyderabad FC", s:1.5, l:"ISL", t:"men_club"},
+        {n:"Odisha FC", s:1.5, l:"ISL", t:"men_club"},
+        {n:"Punjab FC", s:1.5, l:"ISL", t:"men_club"},
+        {n:"Jamshedpur FC", s:1.5, l:"ISL", t:"men_club"},
+        {n:"NorthEast United", s:1.5, l:"ISL", t:"men_club"},
+        {n:"East Bengal", s:1.5, l:"ISL", t:"men_club"},
+
+        // --- AUSTRALIA ---
+        {n:"Melbourne City", s:2.5, l:"A-League", t:"men_club"},
+        {n:"Sydney FC", s:2.5, l:"A-League", t:"men_club"},
+        {n:"Western Sydney Wanderers", s:2, l:"A-League", t:"men_club"},
+        {n:"Adelaide United", s:2, l:"A-League", t:"men_club"},
+        {n:"Melbourne Victory", s:2, l:"A-League", t:"men_club"},
+        {n:"Central Coast Mariners", s:2, l:"A-League", t:"men_club"},
+        {n:"Brisbane Roar", s:1.5, l:"A-League", t:"men_club"},
+        {n:"Perth Glory", s:1.5, l:"A-League", t:"men_club"},
+        {n:"Newcastle Jets", s:1.5, l:"A-League", t:"men_club"},
+        {n:"Wellington Phoenix", s:1.5, l:"A-League", t:"men_club"},
+        {n:"Western United", s:1.5, l:"A-League", t:"men_club"},
+        {n:"Macarthur FC", s:1.5, l:"A-League", t:"men_club"},
+
+        // --- SOUTH AFRICA ---
+        {n:"Mamelodi Sundowns", s:2.5, l:"DStv Premiership", t:"men_club"},
+        {n:"Orlando Pirates", s:2, l:"DStv Premiership", t:"men_club"},
+        {n:"Kaizer Chiefs", s:2, l:"DStv Premiership", t:"men_club"},
+        {n:"SuperSport United", s:1.5, l:"DStv Premiership", t:"men_club"},
+        {n:"Stellenbosch FC", s:1.5, l:"DStv Premiership", t:"men_club"},
+        {n:"Cape Town City", s:1.5, l:"DStv Premiership", t:"men_club"},
+        {n:"Golden Arrows", s:1.5, l:"DStv Premiership", t:"men_club"},
+        {n:"Sekhukhune United", s:1.5, l:"DStv Premiership", t:"men_club"},
+        {n:"AmaZulu", s:1.5, l:"DStv Premiership", t:"men_club"},
+        {n:"Chippa United", s:1.5, l:"DStv Premiership", t:"men_club"},
+        {n:"Polokwane City", s:1.5, l:"DStv Premiership", t:"men_club"},
+        {n:"Richards Bay", s:1.5, l:"DStv Premiership", t:"men_club"},
+        {n:"TS Galaxy", s:1.5, l:"DStv Premiership", t:"men_club"},
+        {n:"Royal AM", s:1.5, l:"DStv Premiership", t:"men_club"},
+        {n:"Swallows FC", s:1.5, l:"DStv Premiership", t:"men_club"},
+
+        // --- REST OF WORLD ---
+        {n:"AEK Athens", s:3.5, l:"Rest of World", t:"men_club"}, 
+        {n:"Al Ain FC", s:3, l:"Rest of World", t:"men_club"}, 
+        {n:"APOEL Nicosia", s:3, l:"Rest of World", t:"men_club"},
+        {n:"Dinamo Zagreb", s:3.5, l:"Rest of World", t:"men_club"},
+        {n:"Dynamo Kyiv", s:3.5, l:"Rest of World", t:"men_club"},
+        {n:"Ferencvárosi TC", s:3, l:"Rest of World", t:"men_club"},
+        {n:"Hajduk Split", s:3, l:"Rest of World", t:"men_club"},
+        {n:"HJK Helsinki", s:2.5, l:"Rest of World", t:"men_club"}, 
+        {n:"Olympiacos", s:4, l:"Rest of World", t:"men_club"},
+        {n:"Panathinaikos", s:4, l:"Rest of World", t:"men_club"},
+        {n:"PAOK", s:4, l:"Rest of World", t:"men_club"},
+        {n:"Qarabağ FK", s:3, l:"Rest of World", t:"men_club"}, 
+        {n:"Shakhtar Donetsk", s:3.5, l:"Rest of World", t:"men_club"},
+        {n:"Slavia Praha", s:3.5, l:"Rest of World", t:"men_club"},
+        {n:"Sparta Praha", s:3.5, l:"Rest of World", t:"men_club"},
+        {n:"Viktoria Plzeň", s:3, l:"Rest of World", t:"men_club"},
+        {n:"MLS All-Stars", s:4.5, l:"Rest of World", t:"men_club"},
+        {n:"Classic XI / Soccer Aid", s:5, l:"Rest of World", t:"men_club"},
+
+        // --- WOMEN'S TEAMS ---
+        // ENGLAND
+        {n:"Chelsea Women", s:5, l:"WSL", t:"women_club"},
+        {n:"Arsenal Women", s:5, l:"WSL", t:"women_club"},
+        {n:"Manchester City Women", s:5, l:"WSL", t:"women_club"},
+        {n:"Manchester United Women", s:4, l:"WSL", t:"women_club"},
+        {n:"Liverpool Women", s:3.5, l:"WSL", t:"women_club"},
+        {n:"Tottenham Hotspur Women", s:3.5, l:"WSL", t:"women_club"},
+        {n:"Aston Villa Women", s:3.5, l:"WSL", t:"women_club"},
+        {n:"Everton Women", s:3.5, l:"WSL", t:"women_club"},
+        {n:"Brighton & Hove Albion Women", s:3.5, l:"WSL", t:"women_club"},
+        {n:"Leicester City Women", s:3, l:"WSL", t:"women_club"},
+        {n:"West Ham United Women", s:3, l:"WSL", t:"women_club"},
+        {n:"Crystal Palace Women", s:3, l:"WSL", t:"women_club"},
+        
+        // SPAIN
+        {n:"FC Barcelona Femení", s:5, l:"Liga F", t:"women_club"},
+        {n:"Real Madrid Femenino", s:5, l:"Liga F", t:"women_club"},
+        {n:"Atlético Madrid Femenino", s:4, l:"Liga F", t:"women_club"},
+        {n:"Levante UD Femenino", s:4, l:"Liga F", t:"women_club"},
+        {n:"Madrid CFF", s:3.5, l:"Liga F", t:"women_club"},
+        {n:"Real Sociedad Femenino", s:3.5, l:"Liga F", t:"women_club"},
+        {n:"Athletic Club Femenino", s:3.5, l:"Liga F", t:"women_club"},
+        {n:"Sevilla FC Femenino", s:3.5, l:"Liga F", t:"women_club"},
+        {n:"Granada CF Femenino", s:3, l:"Liga F", t:"women_club"},
+        {n:"Valencia CF Femenino", s:3, l:"Liga F", t:"women_club"},
+        {n:"Real Betis Femenino", s:3, l:"Liga F", t:"women_club"},
+        {n:"Costa Adeje Tenerife", s:3, l:"Liga F", t:"women_club"},
+        {n:"Eibar Femenino", s:3, l:"Liga F", t:"women_club"},
+        {n:"Levante Las Planas", s:2.5, l:"Liga F", t:"women_club"},
+        {n:"Sporting Huelva", s:2.5, l:"Liga F", t:"women_club"},
+        {n:"Alhama CF", s:2.5, l:"Liga F", t:"women_club"},
+
+        // FRANCE
+        {n:"Olympique Lyonnais Féminin", s:5, l:"Arkema", t:"women_club"},
+        {n:"Paris Saint-Germain Féminine", s:5, l:"Arkema", t:"women_club"},
+        {n:"Paris FC", s:4, l:"Arkema", t:"women_club"},
+        {n:"Montpellier HSC", s:4, l:"Arkema", t:"women_club"},
+        {n:"Fleury 91", s:3.5, l:"Arkema", t:"women_club"},
+        {n:"Dijon FCO", s:3.5, l:"Arkema", t:"women_club"},
+        {n:"Stade de Reims", s:3, l:"Arkema", t:"women_club"},
+        {n:"FC Nantes", s:3, l:"Arkema", t:"women_club"},
+        {n:"Bordeaux", s:3, l:"Arkema", t:"women_club"},
+        {n:"Le Havre AC", s:3, l:"Arkema", t:"women_club"},
+        {n:"Guingamp", s:2.5, l:"Arkema", t:"women_club"},
+        {n:"Lille", s:2.5, l:"Arkema", t:"women_club"},
+
+        // GERMANY
+        {n:"Bayern Munich Women", s:5, l:"Frauen-Bun", t:"women_club"},
+        {n:"VfL Wolfsburg Women", s:5, l:"Frauen-Bun", t:"women_club"},
+        {n:"Eintracht Frankfurt Women", s:4, l:"Frauen-Bun", t:"women_club"},
+        {n:"TSG Hoffenheim Women", s:4, l:"Frauen-Bun", t:"women_club"},
+        {n:"Bayer Leverkusen Women", s:3.5, l:"Frauen-Bun", t:"women_club"},
+        {n:"SC Freiburg Women", s:3.5, l:"Frauen-Bun", t:"women_club"},
+        {n:"SGS Essen", s:3, l:"Frauen-Bun", t:"women_club"},
+        {n:"Werder Bremen Women", s:3, l:"Frauen-Bun", t:"women_club"},
+        {n:"RB Leipzig Women", s:3, l:"Frauen-Bun", t:"women_club"},
+        {n:"FC Köln Women", s:2.5, l:"Frauen-Bun", t:"women_club"},
+        {n:"Carl Zeiss Jena Women", s:2.5, l:"Frauen-Bun", t:"women_club"},
+        {n:"MSV Duisburg Women", s:2.5, l:"Frauen-Bun", t:"women_club"},
+
+        // ITALY
+        {n:"Juventus Women", s:4.5, l:"Serie A Fem", t:"women_club"},
+        {n:"Roma Women", s:4, l:"Serie A Fem", t:"women_club"},
+        {n:"Inter Women", s:4, l:"Serie A Fem", t:"women_club"},
+        {n:"AC Milan Women", s:3.5, l:"Serie A Fem", t:"women_club"},
+        {n:"Fiorentina Women", s:3.5, l:"Serie A Fem", t:"women_club"},
+        {n:"Sassuolo Women", s:3, l:"Serie A Fem", t:"women_club"},
+        {n:"Como Women", s:3, l:"Serie A Fem", t:"women_club"},
+        {n:"Napoli Women", s:3, l:"Serie A Fem", t:"women_club"},
+        {n:"Sampdoria Women", s:2.5, l:"Serie A Fem", t:"women_club"},
+        {n:"Lazio Women", s:2.5, l:"Serie A Fem", t:"women_club"},
+
+        // NETHERLANDS
+        {n:"Ajax Women", s:4, l:"Eredivisie V", t:"women_club"},
+        {n:"FC Twente Women", s:4, l:"Eredivisie V", t:"women_club"},
+        {n:"PSV Women", s:3.5, l:"Eredivisie V", t:"women_club"},
+        {n:"Feyenoord Women", s:3, l:"Eredivisie V", t:"women_club"},
+        {n:"AZ Women", s:3, l:"Eredivisie V", t:"women_club"},
+        {n:"Utrecht Women", s:3, l:"Eredivisie V", t:"women_club"},
+        {n:"Heerenveen Women", s:2.5, l:"Eredivisie V", t:"women_club"},
+        {n:"ADO Den Haag Women", s:2.5, l:"Eredivisie V", t:"women_club"},
+        {n:"Excelsior Women", s:2.5, l:"Eredivisie V", t:"women_club"},
+        {n:"PEC Zwolle Women", s:2.5, l:"Eredivisie V", t:"women_club"},
+        {n:"Telstar Women", s:2.5, l:"Eredivisie V", t:"women_club"},
+        {n:"Fortuna Sittard Women", s:2.5, l:"Eredivisie V", t:"women_club"},
+
+        // USA
+        {n:"Gotham FC", s:5, l:"NWSL", t:"women_club"},
+        {n:"Kansas City Current", s:5, l:"NWSL", t:"women_club"},
+        {n:"Orlando Pride", s:5, l:"NWSL", t:"women_club"},
+        {n:"Washington Spirit", s:5, l:"NWSL", t:"women_club"},
+        {n:"Portland Thorns", s:4.5, l:"NWSL", t:"women_club"},
+        {n:"San Diego Wave", s:4.5, l:"NWSL", t:"women_club"},
+        {n:"North Carolina Courage", s:4.5, l:"NWSL", t:"women_club"},
+        {n:"Angel City FC", s:4, l:"NWSL", t:"women_club"},
+        {n:"OL Reign", s:4, l:"NWSL", t:"women_club"},
+        {n:"Chicago Red Stars", s:4, l:"NWSL", t:"women_club"},
+        {n:"Houston Dash", s:4, l:"NWSL", t:"women_club"},
+        {n:"Racing Louisville", s:4, l:"NWSL", t:"women_club"},
+        {n:"Utah Royals", s:4, l:"NWSL", t:"women_club"},
+        {n:"Bay FC", s:4, l:"NWSL", t:"women_club"}
+    ];
+
+    function updateRange(side) {
+        const minInput = document.getElementById(side + 'Min');
+        const maxInput = document.getElementById(side + 'Max');
+        const minValDisp = document.getElementById(side + 'MinVal');
+        const maxValDisp = document.getElementById(side + 'MaxVal');
+
+        let min = parseFloat(minInput.value);
+        let max = parseFloat(maxInput.value);
+
+        if (min > max) {
+            if (document.activeElement === minInput) {
+                maxInput.value = min;
+                max = min;
+            } else {
+                minInput.value = max;
+                min = max;
+            }
+        }
+
+        minValDisp.innerText = min.toFixed(1);
+        maxValDisp.innerText = max.toFixed(1);
+    }
+
+    function getStarString(rating) {
+        let str = '';
+        const fullStars = Math.floor(rating);
+        const hasHalf = rating % 1 !== 0;
+
+        for (let i = 0; i < fullStars; i++) str += '★';
+        if (hasHalf) str += '½';
+        return str;
+    }
+
+    // --- SMART RANDOM SELECTION ---
+    // Handles repetition by using history, but falls back to oldest-used if pool is too small
+    function getRandomTeam(pool) {
+        if (!pool || pool.length === 0) return null;
+        
+        // 1. Try to find teams NOT in history
+        const freshPool = pool.filter(t => !isTeamOnCooldown(t.n));
+        
+        if (freshPool.length > 0) {
+            // Best case: pick from teams we haven't seen recently
+            return freshPool[Math.floor(Math.random() * freshPool.length)];
+        } 
+        
+        // 2. Fallback: All teams in pool are in history (pool is small)
+        // Sort pool by when they were last used (least recently used first)
+        // recentTeams is FIFO [oldest, ..., newest]
+        // We want teams that appear earliest in recentTeams
+        
+        // Map pool items to their index in recentTeams (or -1 if not found, though logic says they should be found)
+        const sortedByRecency = [...pool].sort((a, b) => {
+            const indexA = recentTeams.indexOf(a.n);
+            const indexB = recentTeams.indexOf(b.n);
+            // If index is -1 (not in history), treat as very old (-Infinity)
+            // But freshPool check already handled that case.
+            return indexA - indexB; // Ascending: smallest index (oldest) first
+        });
+
+        // Pick from the top 30% of "oldest" teams to allow some randomness but prioritize rotation
+        const sliceSize = Math.max(1, Math.floor(sortedByRecency.length * 0.3));
+        const candidatePool = sortedByRecency.slice(0, sliceSize);
+        
+        return candidatePool[Math.floor(Math.random() * candidatePool.length)];
+    }
+
+    function showError(msg) {
+        const errorDiv = document.getElementById('errorMsg');
+        const matchDisplay = document.getElementById('matchDisplay');
+        errorDiv.innerText = msg;
+        errorDiv.style.display = 'block';
+        matchDisplay.classList.remove('visible');
+    }
+
+    function displayMatch(home, away, contextLabel) {
+        const errorDiv = document.getElementById('errorMsg');
+        const matchDisplay = document.getElementById('matchDisplay');
+        const homeCard = document.getElementById('homeCard');
+        const awayCard = document.getElementById('awayCard');
+        const contextBadge = document.getElementById('matchContext');
+
+        errorDiv.style.display = 'none';
+
+        // Add to history
+        addToHistory(home.n);
+        addToHistory(away.n);
+
+        // Update Badge Style based on context
+        contextBadge.className = 'context-badge'; // reset
+        if (contextLabel) {
+            contextBadge.innerText = contextLabel;
+            contextBadge.style.display = 'block';
+            
+            if (contextLabel.includes("Derby")) {
+                contextBadge.classList.add('derby');
+            } else if (contextLabel.includes("Rematch") || contextLabel.includes("History") || contextLabel.includes("Classic") || contextLabel.includes("Final") || contextLabel.includes("Miracle") || contextLabel.includes("👑")) {
+                contextBadge.classList.add('historic');
+            }
+        } else {
+            contextBadge.style.display = 'none';
+        }
+
+        document.getElementById('homeName').innerText = home.n;
+        document.getElementById('homeLeague').innerText = home.l;
+        document.getElementById('homeStars').innerHTML = getStarString(home.s);
+
+        document.getElementById('awayName').innerText = away.n;
+        document.getElementById('awayLeague').innerText = away.l;
+        document.getElementById('awayStars').innerHTML = getStarString(away.s);
+
+        // Visual enhancement: highlight winner based on stars
+        homeCard.style.borderColor = "#333";
+        awayCard.style.borderColor = "#333";
+        
+        if (home.s > away.s) {
+            homeCard.style.borderColor = "var(--primary)";
+        } else if (away.s > home.s) {
+            awayCard.style.borderColor = "var(--primary)";
+        }
+
+        matchDisplay.classList.remove('visible');
+        void matchDisplay.offsetWidth; // Trigger reflow
+        matchDisplay.classList.add('visible');
+    }
+
+    function getRegion(league) {
+        if (league.includes('Premier League') || league.includes('Championship') || league.includes('League One') || league.includes('League Two') || league.includes('WSL')) return 'England';
+        if (league.includes('LaLiga') || league.includes('Liga F')) return 'Spain';
+        if (league.includes('Bundesliga') || league.includes('Frauen-Bun')) return 'Germany';
+        if (league.includes('Serie A') || league.includes('Serie B')) return 'Italy';
+        if (league.includes('Ligue 1') || league.includes('Arkema')) return 'France';
+        if (league.includes('MLS') || league.includes('NWSL')) return 'USA';
+        if (league.includes('Liga Portugal')) return 'Portugal';
+        if (league.includes('Eredivisie')) return 'Netherlands';
+        if (league.includes('Pro League')) return 'Belgium';
+        if (league.includes('Süper Lig')) return 'Turkey';
+        if (league.includes('Premiership')) return 'Scotland';
+        if (league.includes('Liga MX')) return 'Mexico';
+        if (league.includes('Liga Profesional')) return 'Argentina';
+        if (league.includes('CONMEBOL')) return 'Brazil';
+        if (league.includes('ROSHN')) return 'Saudi';
+        if (league.includes('J1 League')) return 'Japan';
+        return 'World';
+    }
+
+    function generateCustomMatch() {
+        const homeType = document.getElementById('homeType').value;
+        const awayType = document.getElementById('awayType').value;
+        
+        const homeMin = parseFloat(document.getElementById('homeMin').value);
+        const homeMax = parseFloat(document.getElementById('homeMax').value);
+        
+        const awayMin = parseFloat(document.getElementById('awayMin').value);
+        const awayMax = parseFloat(document.getElementById('awayMax').value);
+
+        const homePool = teamsDB.filter(t => {
+            if (homeType !== 'all' && t.t !== homeType) return false;
+            return t.s >= homeMin && t.s <= homeMax;
+        });
+
+        const awayPool = teamsDB.filter(t => {
+            if (awayType !== 'all' && t.t !== awayType) return false;
+            return t.s >= awayMin && t.s <= awayMax;
+        });
+
+        if (homePool.length === 0) { showError(`No Home teams found for ${homeMin}-${homeMax}★`); return; }
+        if (awayPool.length === 0) { showError(`No Away teams found for ${awayMin}-${awayMax}★`); return; }
+
+        let homeTeam = getRandomTeam(homePool);
+        let awayTeam = getRandomTeam(awayPool);
+
+        let attempts = 0;
+        // Ensure not same team
+        while ((homeTeam.n === awayTeam.n) && attempts < 15) {
+            awayTeam = getRandomTeam(awayPool);
+            attempts++;
+        }
+
+        displayMatch(homeTeam, awayTeam, "Custom Parameters");
+    }
+
+    function generateMemorableMatch() {
+        // Filter out matches where teams aren't in current DB (safety check)
+        const validMemorable = memorableDB.filter(m => {
+            const t1 = teamsDB.find(t => t.n === m.t1);
+            const t2 = teamsDB.find(t => t.n === m.t2);
+            return t1 && t2;
+        });
+
+        if (validMemorable.length === 0) {
+            showError("Database Error: No memorable matches found.");
+            return;
+        }
+
+        // Pick random
+        const match = validMemorable[Math.floor(Math.random() * validMemorable.length)];
+        const h = teamsDB.find(t => t.n === match.t1);
+        const a = teamsDB.find(t => t.n === match.t2);
+        
+        displayMatch(h, a, match.label);
+    }
+
+    function generateRealWorldMatch() {
+        const realMin = parseFloat(document.getElementById('realMin').value);
+        const realMax = parseFloat(document.getElementById('realMax').value);
+
+        const typeRoll = Math.random();
+        const teamType = typeRoll > 0.2 ? 'men_club' : 'women_club'; 
+        
+        const typePool = teamsDB.filter(t => t.t === teamType && t.s >= realMin && t.s <= realMax);
+        
+        if (typePool.length === 0) {
+            showError(`No real match teams found in range ${realMin}-${realMax}★.`);
+            return;
+        }
+
+        const scenarioRoll = Math.random();
+
+        // 1. DERBY MATCH (Priority)
+        if (scenarioRoll < 0.20 && teamType === 'men_club') {
+            const derbyCandidates = typePool.filter(t => {
+                if (!derbyDB[t.n]) return false;
+                if (isTeamOnCooldown(t.n)) return false;
+                return derbyDB[t.n].some(rivalName => teamsDB.some(dbT => dbT.n === rivalName && !isTeamOnCooldown(rivalName)));
+            });
+
+            if (derbyCandidates.length > 0) {
+                const homeTeam = derbyCandidates[Math.floor(Math.random() * derbyCandidates.length)];
+                const rivals = derbyDB[homeTeam.n];
+                const validRivals = rivals.filter(rName => 
+                    teamsDB.some(t => t.n === rName && !isTeamOnCooldown(rName))
+                );
+                
+                if (validRivals.length > 0) {
+                    const rivalName = validRivals[Math.floor(Math.random() * validRivals.length)];
+                    const awayTeam = teamsDB.find(t => t.n === rivalName);
+                    displayMatch(homeTeam, awayTeam, "🔥 Derby Match");
+                    return;
+                }
+            }
+        }
+
+        // 2. STANDARD LOGIC
+        const homeTeam = getRandomTeam(typePool);
+        if (!homeTeam) { showError("Database Error."); return; }
+        
+        const homeRegion = getRegion(homeTeam.l);
+        let awayTeam = null;
+        let matchLabel = "";
+
+        const stdRoll = Math.random();
+
+        // League
+        if (stdRoll < 0.4) {
+            const leaguePool = typePool.filter(t => t.l === homeTeam.l && t.n !== homeTeam.n && !isTeamOnCooldown(t.n));
+            if (leaguePool.length > 0) {
+                awayTeam = leaguePool[Math.floor(Math.random() * leaguePool.length)];
+                matchLabel = "⚔️ League Match";
+            }
+        }
+
+        // Cup
+        if (!awayTeam && stdRoll < 0.7) {
+            const cupPool = typePool.filter(t => getRegion(t.l) === homeRegion && t.n !== homeTeam.n && !isTeamOnCooldown(t.n));
+            if (cupPool.length > 0) {
+                awayTeam = cupPool[Math.floor(Math.random() * cupPool.length)];
+                matchLabel = (awayTeam.l !== homeTeam.l) ? `🏆 Domestic Cup (${homeTeam.l} vs ${awayTeam.l})` : "🏆 Domestic Cup Tie";
+            }
+        }
+
+        // Continental
+        if (!awayTeam) {
+            const continentalPool = typePool.filter(t => {
+                if (t.n === homeTeam.n) return false;
+                if (isTeamOnCooldown(t.n)) return false;
+                if (getRegion(t.l) === homeRegion) return false; 
+                return Math.abs(t.s - homeTeam.s) <= 1.0; 
+            });
+
+            if (continentalPool.length > 0) {
+                awayTeam = continentalPool[Math.floor(Math.random() * continentalPool.length)];
+                if (homeTeam.s >= 4.5 && awayTeam.s >= 4.5) {
+                    matchLabel = "🌍 Champions League Night";
+                } else if (homeTeam.s >= 3.5) {
+                    matchLabel = "🌍 Europa / Conference League";
+                } else {
+                    matchLabel = "🌎 Continental Friendly";
+                }
+            }
+        }
+
+        // Fallback
+        if (!awayTeam) {
+            matchLabel = "⚖️ Balanced Matchup";
+            let fallbackPool = typePool.filter(t => t.n !== homeTeam.n && Math.abs(t.s - homeTeam.s) <= 0.5 && !isTeamOnCooldown(t.n));
+            
+            if (fallbackPool.length === 0) {
+                fallbackPool = typePool.filter(t => t.n !== homeTeam.n && Math.abs(t.s - homeTeam.s) <= 0.5);
+            }
+
+            if (fallbackPool.length > 0) {
+                awayTeam = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
+            }
+        }
+
+        // Final Safety
+        if (!awayTeam) {
+             const anyOpponent = typePool.filter(t => t.n !== homeTeam.n);
+             if (anyOpponent.length > 0) {
+                 awayTeam = anyOpponent[Math.floor(Math.random() * anyOpponent.length)];
+                 matchLabel = "🎲 Random Friendly";
+             } else {
+                 showError("Not enough teams available.");
+                 return;
+             }
+        }
+
+        displayMatch(homeTeam, awayTeam, matchLabel);
+    }
+
+    // Initial Range Update
+    updateRange('home');
+    updateRange('away');
+    updateRange('real');
+
+</script>
+
+</body>
+</html>
